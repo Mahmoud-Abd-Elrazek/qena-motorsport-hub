@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Shield } from "lucide-react";
 import { useState } from "react";
 
 const Header = () => {
@@ -43,6 +43,16 @@ const Header = () => {
                 </Button>
               </Link>
             ))}
+            <Link to="/admin">
+              <Button
+                variant={location.pathname === "/admin" ? "default" : "ghost"}
+                className="transition-smooth"
+                size="icon"
+                title="لوحة التحكم"
+              >
+                <Shield className="h-4 w-4" />
+              </Button>
+            </Link>
           </nav>
 
           {/* Mobile Menu Button */}
@@ -69,6 +79,15 @@ const Header = () => {
                 </Button>
               </Link>
             ))}
+            <Link to="/admin" onClick={() => setIsMenuOpen(false)}>
+              <Button
+                variant={location.pathname === "/admin" ? "default" : "ghost"}
+                className="w-full justify-start transition-smooth"
+              >
+                <Shield className="ml-2 h-4 w-4" />
+                لوحة التحكم
+              </Button>
+            </Link>
           </nav>
         )}
       </div>
