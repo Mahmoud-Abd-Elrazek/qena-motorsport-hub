@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import { ArrowLeft } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ProjectCardProps {
   id: string;
@@ -13,6 +14,8 @@ interface ProjectCardProps {
 }
 
 const ProjectCard = ({ id, title, description, image, year, category }: ProjectCardProps) => {
+  const { t } = useLanguage();
+  
   return (
     <Card className="group overflow-hidden hover:shadow-racing transition-smooth">
       <div className="relative h-56 overflow-hidden">
@@ -40,7 +43,7 @@ const ProjectCard = ({ id, title, description, image, year, category }: ProjectC
 
         <Link to={`/projects/${id}`}>
           <Button variant="outline" className="w-full group/btn">
-            <span>التفاصيل</span>
+            <span>{t('projects.details')}</span>
             <ArrowLeft className="mr-2 h-4 w-4 group-hover/btn:-translate-x-1 transition-smooth" />
           </Button>
         </Link>

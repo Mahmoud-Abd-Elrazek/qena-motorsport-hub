@@ -1,19 +1,21 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
-import { Menu, X, Shield } from "lucide-react";
+import { Menu, X, Shield, Languages } from "lucide-react";
 import { useState } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Header = () => {
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { language, toggleLanguage, t } = useLanguage();
 
   const navItems = [
-    { path: "/", label: "الرئيسية" },
-    { path: "/about", label: "من نحن" },
-    { path: "/team", label: "الفريق" },
-    { path: "/projects", label: "المشاريع" },
-    { path: "/leaderboard", label: "لوحة الصدارة" },
-    { path: "/contact", label: "اتصل بنا" },
+    { path: "/", label: t('nav.home') },
+    { path: "/about", label: t('nav.about') },
+    { path: "/team", label: t('nav.team') },
+    { path: "/projects", label: t('nav.projects') },
+    { path: "/leaderboard", label: t('nav.leaderboard') },
+    { path: "/contact", label: t('nav.contact') },
   ];
 
   return (
@@ -43,6 +45,15 @@ const Header = () => {
                 </Button>
               </Link>
             ))}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleLanguage}
+              title={language === 'ar' ? 'English' : 'العربية'}
+              className="transition-smooth"
+            >
+              <Languages className="h-4 w-4" />
+            </Button>
             <Link to="/admin">
               <Button
                 variant={location.pathname === "/admin" ? "default" : "ghost"}
@@ -79,6 +90,14 @@ const Header = () => {
                 </Button>
               </Link>
             ))}
+            <Button
+              variant="ghost"
+              onClick={toggleLanguage}
+              className="w-full justify-start transition-smooth"
+            >
+              <Languages className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
+              {language === 'ar' ? 'English' : 'العربية'}
+            </Button>
             <Link to="/admin" onClick={() => setIsMenuOpen(false)}>
               <Button
                 variant={location.pathname === "/admin" ? "default" : "ghost"}

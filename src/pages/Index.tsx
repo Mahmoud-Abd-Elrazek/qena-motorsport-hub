@@ -8,8 +8,11 @@ import ProjectCard from "@/components/ProjectCard";
 import { projects, sponsors } from "@/data/mockData";
 import heroImage from "@/assets/hero-racing.jpg";
 import workshopImage from "@/assets/team-workshop.jpg";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Index = () => {
+  const { t } = useLanguage();
+  
   return (
     <div className="min-h-screen">
       <Header />
@@ -28,21 +31,21 @@ const Index = () => {
         <div className="relative container mx-auto px-4 h-full flex items-center">
           <div className="max-w-2xl space-y-6 animate-in fade-in slide-in-from-right-10 duration-1000">
             <h1 className="text-5xl md:text-7xl font-black text-white leading-tight">
-              فريق سباقات قنا
+              {t('hero.title')}
             </h1>
             <p className="text-xl md:text-2xl text-white/90 leading-relaxed">
-              نحن فريق رياضي متميز نسعى للتميز والابتكار في عالم السباقات والهندسة الميكانيكية
+              {t('hero.subtitle')}
             </p>
             <div className="flex flex-wrap gap-4">
               <Link to="/about">
                 <Button size="lg" className="gradient-hero shadow-racing text-lg">
-                  اكتشف المزيد
+                  {t('hero.discover')}
                   <ArrowLeft className="mr-2 h-5 w-5" />
                 </Button>
               </Link>
               <Link to="/projects">
                 <Button size="lg" variant="outline" className="bg-white/10 backdrop-blur border-white/20 text-white hover:bg-white/20 text-lg">
-                  شاهد المشاريع
+                  {t('hero.projects')}
                 </Button>
               </Link>
             </div>
@@ -61,7 +64,7 @@ const Index = () => {
                 </div>
               </div>
               <h3 className="text-4xl font-bold text-primary">25+</h3>
-              <p className="text-muted-foreground">عضو نشط</p>
+              <p className="text-muted-foreground">{t('stats.members')}</p>
             </div>
             <div className="text-center space-y-2">
               <div className="flex justify-center">
@@ -70,7 +73,7 @@ const Index = () => {
                 </div>
               </div>
               <h3 className="text-4xl font-bold text-primary">15+</h3>
-              <p className="text-muted-foreground">مشروع مكتمل</p>
+              <p className="text-muted-foreground">{t('stats.projects')}</p>
             </div>
             <div className="text-center space-y-2">
               <div className="flex justify-center">
@@ -79,7 +82,7 @@ const Index = () => {
                 </div>
               </div>
               <h3 className="text-4xl font-bold text-primary">5</h3>
-              <p className="text-muted-foreground">سنوات خبرة</p>
+              <p className="text-muted-foreground">{t('stats.years')}</p>
             </div>
             <div className="text-center space-y-2">
               <div className="flex justify-center">
@@ -88,7 +91,7 @@ const Index = () => {
                 </div>
               </div>
               <h3 className="text-4xl font-bold text-primary">10+</h3>
-              <p className="text-muted-foreground">جائزة وإنجاز</p>
+              <p className="text-muted-foreground">{t('stats.awards')}</p>
             </div>
           </div>
         </div>
@@ -100,20 +103,20 @@ const Index = () => {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
               <div>
-                <p className="text-primary font-bold mb-2">من نحن</p>
+                <p className="text-primary font-bold mb-2">{t('about.tag')}</p>
                 <h2 className="text-4xl md:text-5xl font-black text-foreground leading-tight">
-                  فريق متميز في عالم السباقات
+                  {t('about.title')}
                 </h2>
               </div>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                نحن فريق من المهندسين والمبتكرين الشغوفين بعالم السباقات والهندسة الميكانيكية. نسعى لتصميم وتطوير سيارات سباق متطورة تجمع بين الأداء العالي والكفاءة.
+                {t('about.desc1')}
               </p>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                رؤيتنا هي أن نصبح فريقاً رائداً في مجال السباقات على المستوى الإقليمي والدولي، من خلال الابتكار المستمر والعمل الجماعي المتميز.
+                {t('about.desc2')}
               </p>
               <Link to="/about">
                 <Button size="lg" className="gradient-hero shadow-racing">
-                  اقرأ المزيد عنا
+                  {t('about.readMore')}
                   <ArrowLeft className="mr-2 h-5 w-5" />
                 </Button>
               </Link>
@@ -133,12 +136,12 @@ const Index = () => {
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <p className="text-primary font-bold mb-2">المشاريع</p>
+            <p className="text-primary font-bold mb-2">{t('projects.tag')}</p>
             <h2 className="text-4xl md:text-5xl font-black text-foreground leading-tight mb-4">
-              أحدث مشاريعنا
+              {t('projects.title')}
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              استكشف أحدث المشاريع والابتكارات التي قام بها فريقنا
+              {t('projects.subtitle')}
             </p>
           </div>
 
@@ -151,7 +154,7 @@ const Index = () => {
           <div className="text-center mt-12">
             <Link to="/projects">
               <Button size="lg" variant="outline">
-                عرض جميع المشاريع
+                {t('projects.viewAll')}
                 <ArrowLeft className="mr-2 h-5 w-5" />
               </Button>
             </Link>
@@ -163,9 +166,9 @@ const Index = () => {
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <p className="text-primary font-bold mb-2">شركاؤنا</p>
+            <p className="text-primary font-bold mb-2">{t('sponsors.tag')}</p>
             <h2 className="text-4xl md:text-5xl font-black text-foreground leading-tight">
-              شركاء النجاح
+              {t('sponsors.title')}
             </h2>
           </div>
 
@@ -189,14 +192,14 @@ const Index = () => {
       <section className="py-20 gradient-hero">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-4xl md:text-5xl font-black text-white mb-6">
-            هل أنت مستعد للانضمام لفريقنا؟
+            {t('cta.title')}
           </h2>
           <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            نحن نبحث دائماً عن مواهب جديدة ومتحمسة للانضمام إلى فريقنا
+            {t('cta.subtitle')}
           </p>
           <Link to="/contact">
             <Button size="lg" variant="secondary" className="text-lg">
-              تواصل معنا الآن
+              {t('cta.contact')}
               <ArrowLeft className="mr-2 h-5 w-5" />
             </Button>
           </Link>
