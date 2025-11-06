@@ -193,7 +193,7 @@ const AdminDashboard = () => {
               <p className="text-sm text-muted-foreground">
                 إضافة، تعديل، أو حذف أعضاء الفريق وإدارة معلوماتهم
               </p>
-              <Button className="w-full">
+              <Button className="w-full" onClick={() => navigate("/admin/members")}>
                 إدارة الأعضاء
               </Button>
             </CardContent>
@@ -210,7 +210,7 @@ const AdminDashboard = () => {
               <p className="text-sm text-muted-foreground">
                 إضافة مشاريع جديدة وتحديث تفاصيل المشاريع الحالية
               </p>
-              <Button className="w-full">
+              <Button className="w-full" onClick={() => navigate("/admin/projects")}>
                 إدارة المشاريع
               </Button>
             </CardContent>
@@ -227,7 +227,7 @@ const AdminDashboard = () => {
               <p className="text-sm text-muted-foreground">
                 إضافة أو تعديل نقاط الأعضاء بناءً على أدائهم الأسبوعي
               </p>
-              <Button className="w-full">
+              <Button className="w-full" onClick={() => navigate("/admin/points")}>
                 إدارة النقاط
               </Button>
             </CardContent>
@@ -244,7 +244,7 @@ const AdminDashboard = () => {
               <p className="text-sm text-muted-foreground">
                 عرض والرد على الرسائل الواردة من صفحة اتصل بنا
               </p>
-              <Button className="w-full">
+              <Button className="w-full" onClick={() => navigate("/admin/messages")}>
                 عرض الرسائل
               </Button>
             </CardContent>

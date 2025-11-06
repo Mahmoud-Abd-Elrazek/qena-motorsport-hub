@@ -13,6 +13,10 @@ import ProjectDetails from "./pages/ProjectDetails";
 import Leaderboard from "./pages/Leaderboard";
 import Contact from "./pages/Contact";
 import AdminDashboard from "./pages/AdminDashboard";
+import ManageMembers from "./pages/admin/ManageMembers";
+import ManageProjects from "./pages/admin/ManageProjects";
+import ManagePoints from "./pages/admin/ManagePoints";
+import ManageMessages from "./pages/admin/ManageMessages";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +38,10 @@ const App = () => (
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/members" element={<ManageMembers />} />
+            <Route path="/admin/projects" element={<ManageProjects />} />
+            <Route path="/admin/points" element={<ManagePoints />} />
+            <Route path="/admin/messages" element={<ManageMessages />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
