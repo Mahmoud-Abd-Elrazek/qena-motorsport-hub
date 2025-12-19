@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,29 +6,90 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Users, FolderKanban, Trophy, Mail, LogOut, Shield } from "lucide-react";
+import { jwtDecode } from "jwt-decode";
+
+type JwtPayload = {
+  exp: number;
+};
+
+export const isTokenExpired = (token: string): boolean => {
+  try {
+    const decoded = jwtDecode<JwtPayload>(token);
+    const currentTime = Date.now() / 1000; // بالثواني
+    return decoded.exp < currentTime;
+  } catch {
+    return true; // token invalid
+  }
+};
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Simple demo authentication (In production, use proper backend auth)
-    if (email === "admin@qenaracingteam.com" && password === "admin123") {
-      setIsAuthenticated(true);
-      toast.success("تم تسجيل الدخول بنجاح");
-    } else {
-      toast.error("البريد الإلكتروني أو كلمة المرور غير صحيحة");
+
+    try {
+      const response = await fetch("http://qenaracingteam.runasp.net/Racing/Authentication/Login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          toast.error("البريد الإلكتروني أو كلمة المرور غير صحيحة");
+        } else {
+          toast.error("حدث خطأ أثناء الاتصال بالسيرفر");
+        }
+        return;
+      }
+
+      const data = await response.json();
+      const token = data.data;
+      if (token) {
+        localStorage.setItem("token", token);
+        setIsAuthenticated(true);
+        toast.success("تم تسجيل الدخول بنجاح");
+
+        navigate("/admin");
+      } else {
+        toast.error("لم يتم العثور على بيانات صالحة في الاستجابة");
+      }
+    } catch (error) {
+      toast.error("تعذر الاتصال بالسيرفر");
     }
   };
 
+  // ========================== Todo ==========================
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      setIsAuthenticated(false);
+      return;
+    }
+
+    if (isTokenExpired(token)) {
+      localStorage.removeItem("token");
+      setIsAuthenticated(false);
+      toast.error("انتهت صلاحية الجلسة");
+      navigate("/admin");
+    } else {
+      setIsAuthenticated(true);
+    }
+  }, []);
+  // ========================== Todo ==========================
+
   const handleLogout = () => {
     setIsAuthenticated(false);
-    setEmail("");
+    setUsername("");
     setPassword("");
+    localStorage.removeItem("token");
     toast.success("تم تسجيل الخروج بنجاح");
   };
 
@@ -53,12 +114,12 @@ const AdminDashboard = () => {
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">البريد الإلكتروني</Label>
+                <Label htmlFor="username">البريد الإلكتروني</Label>
                 <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  id="username"
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   placeholder="admin@example.com"
                   dir="ltr"
                   required
