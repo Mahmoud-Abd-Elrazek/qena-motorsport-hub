@@ -22,7 +22,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ArrowRight, Plus, Pencil, Trash2, Loader2, Linkedin } from "lucide-react";
+import { ArrowRight, Plus, Pencil, Trash2, Loader2, Linkedin, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
 interface Member {
@@ -36,6 +36,7 @@ interface Member {
   currentImageUrl?: string;
   image?: File;
 }
+
 
 const ManageMembers = () => {
   const navigate = useNavigate();
@@ -52,6 +53,36 @@ const ManageMembers = () => {
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const observer = useRef<IntersectionObserver | null>(null);
+
+
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [memberToDelete, setMemberToDelete] = useState<Member | null>(null); // لتخزين بيانات العضو المراد حذفه
+
+
+  const confirmDelete = async () => {
+    if (!memberToDelete || isLoading) return;
+
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`http://qenaracingteam.runasp.net/Racing/Member/DeleteMember/${memberToDelete.id}`, {
+        method: "DELETE",
+        headers: { "Authorization": `Bearer ${token}` },
+      });
+
+      if (!response.ok) throw new Error();
+
+      setMembers(prev => prev.filter(m => m.id !== memberToDelete.id));
+      toast.success(`تم حذف العضو ${memberToDelete.name} بنجاح`);
+    } catch {
+      toast.error("فشل في عملية الحذف");
+    } finally {
+      setIsLoading(false);
+      setIsDeleteDialogOpen(false);
+      setMemberToDelete(null);
+    }
+  };
+
 
   const fetchMembers = useCallback(async (pageNumber: number) => {
     if (isLoading || (!hasMore && pageNumber !== 1)) return;
@@ -139,7 +170,6 @@ const ManageMembers = () => {
     const token = localStorage.getItem("token");
     const data = new FormData();
 
-    // إعداد البيانات (كما هي في الكود السابق)
     if (editingMember) data.append("Id", editingMember.id.toString());
     data.append("Name", formData.name || "");
     data.append("Role", formData.role || "");
@@ -150,7 +180,6 @@ const ManageMembers = () => {
     if (formData.image) data.append("Image", formData.image);
 
     try {
-      // 2. تفعيل حالة التحميل فوراً
       setIsLoading(true);
 
       const url = editingMember
@@ -242,7 +271,15 @@ const ManageMembers = () => {
                         <Button variant="outline" size="icon" className="h-8 w-8 text-blue-600" onClick={() => { setEditingMember(member); setFormData(member); setIsDialogOpen(true); }}>
                           <Pencil className="h-4 w-4" />
                         </Button>
-                        <Button variant="outline" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(member.id)}>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-8 w-8 text-destructive hover:bg-destructive/100"
+                          onClick={() => {
+                            setMemberToDelete(member);
+                            setIsDeleteDialogOpen(true);
+                          }}
+                        >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
@@ -343,6 +380,46 @@ const ManageMembers = () => {
               ) : (
                 "حفظ البيانات"
               )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* نافذة تأكيد الحذف الاحترافية */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={(v) => !isLoading && setIsDeleteDialogOpen(v)}>
+        <DialogContent className="max-w-[400px] border-none shadow-2xl p-6">
+          <div className="flex flex-col items-center text-center">
+            {/* أيقونة تحذير */}
+            <div className="h-14 w-14 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
+              <AlertTriangle className="h-7 w-7 text-destructive" />
+            </div>
+
+            <DialogHeader>
+              <DialogTitle className="text-xl text-center font-bold">تأكيد الحذف</DialogTitle>
+              <DialogDescription className="text-center pt-2 text-base">
+                هل أنت متأكد من حذف <span className="font-bold text-foreground">"{memberToDelete?.name}"</span>؟
+                <br />
+                <span className="text-sm text-destructive mt-2 block">هذا الإجراء لا يمكن الرجوع عنه.</span>
+              </DialogDescription>
+            </DialogHeader>
+          </div>
+
+          <DialogFooter className="flex flex-row gap-3 sm:justify-center mt-6">
+            <Button
+              variant="ghost"
+              className="flex-1 hover:bg-muted"
+              onClick={() => setIsDeleteDialogOpen(false)}
+              disabled={isLoading}
+            >
+              إلغاء
+            </Button>
+            <Button
+              variant="destructive"
+              className="flex-1 shadow-sm"
+              onClick={confirmDelete}
+              disabled={isLoading}
+            >
+              {isLoading ? <Loader2 className="h-4 w-4 animate-spin ml-2" /> : "نعم، احذف الآن"}
             </Button>
           </DialogFooter>
         </DialogContent>
