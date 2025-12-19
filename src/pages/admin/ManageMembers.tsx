@@ -162,7 +162,7 @@ const ManageMembers = () => {
   const handleSave = async () => {
     if (isLoading) return;
 
-    if (!formData.name || !formData.role) {
+    if (!formData.name || !formData.image || !formData.role || !formData.points || !formData.specialization || !formData.bio) {
       toast.error("يرجى ملء الحقول المطلوبة");
       return;
     }
@@ -319,7 +319,14 @@ const ManageMembers = () => {
               </Avatar>
               <div className="grid gap-1.5 flex-1">
                 <Label>الصورة الشخصية</Label>
-                <Input type="file" accept="image/*" className="cursor-pointer" onChange={(e) => setFormData({ ...formData, image: e.target.files?.[0] })} />
+                <Input type="file" accept="image/*" className="cursor-pointer" onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file && file.size > 2 * 1024 * 1024) {
+                    toast.error("حجم الصورة كبير جداً! الحد الأقصى 2 ميجابايت");
+                    return;
+                  }
+                  setFormData({ ...formData, image: file });
+                }} />
               </div>
             </div>
 
@@ -346,30 +353,31 @@ const ManageMembers = () => {
             </div>
 
             <div className="grid gap-2">
+              <Label>نبذة تعريفية</Label>
+              <Textarea rows={3} value={formData.bio} onChange={(e) => setFormData({ ...formData, bio: e.target.value })} />
+            </div>
+
+            <div className="grid gap-2">
               <Label className="flex items-center gap-2 text-blue-700">
                 <Linkedin className="h-4 w-4" /> رابط LinkedIn
               </Label>
               <Input dir="ltr" placeholder="https://linkedin.com/in/username" value={formData.linkedInUrl} onChange={(e) => setFormData({ ...formData, linkedInUrl: e.target.value })} />
             </div>
 
-            <div className="grid gap-2">
-              <Label>نبذة تعريفية</Label>
-              <Textarea rows={3} value={formData.bio} onChange={(e) => setFormData({ ...formData, bio: e.target.value })} />
-            </div>
           </div>
 
           <DialogFooter className="gap-2 sm:gap-0">
             <Button
               variant="outline"
               onClick={() => setIsDialogOpen(false)}
-              disabled={isLoading} // تعطيل زر الإلغاء أيضاً أثناء التحميل لزيادة الأمان
+              disabled={isLoading}
             >
               إلغاء
             </Button>
 
             <Button
               onClick={handleSave}
-              disabled={isLoading} // هذا هو السطر الأهم لمنع الضغط المتكرر
+              disabled={isLoading}
               className="px-8 min-w-[120px]"
             >
               {isLoading ? (
