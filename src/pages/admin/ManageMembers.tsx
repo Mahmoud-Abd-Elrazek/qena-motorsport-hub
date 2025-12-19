@@ -162,10 +162,11 @@ const ManageMembers = () => {
   const handleSave = async () => {
     if (isLoading) return;
 
-    if (!formData.name || !formData.image || !formData.role || !formData.points || !formData.specialization || !formData.bio) {
+    if (!formData.name || !formData.role || formData.points === undefined || !formData.specialization || !formData.bio) {
       toast.error("يرجى ملء الحقول المطلوبة");
       return;
     }
+
 
     const token = localStorage.getItem("token");
     const data = new FormData();

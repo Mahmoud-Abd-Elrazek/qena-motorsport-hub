@@ -19,6 +19,8 @@ import ManagePoints from "./pages/admin/ManagePoints";
 import ManageMessages from "./pages/admin/ManageMessages";
 import NotFound from "./pages/NotFound";
 
+import AuthGuard from "@/components/AuthGuard"
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -37,11 +39,31 @@ const App = () => (
             <Route path="/projects/:id" element={<ProjectDetails />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/contact" element={<Contact />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/members" element={<ManageMembers />} />
-            <Route path="/admin/projects" element={<ManageProjects />} />
-            <Route path="/admin/points" element={<ManagePoints />} />
-            <Route path="/admin/messages" element={<ManageMessages />} />
+            <Route path="/admin" element={
+              <AuthGuard>
+                <AdminDashboard />
+              </AuthGuard>
+            } />
+            <Route path="/admin/members" element={
+              <AuthGuard>
+                <ManageMembers />
+              </AuthGuard>
+            } />
+            <Route path="/admin/projects" element={
+              <AuthGuard>
+                <ManageProjects />
+              </AuthGuard>
+            } />
+            <Route path="/admin/points" element={
+              <AuthGuard>
+                <ManagePoints />
+              </AuthGuard>
+            } />
+            <Route path="/admin/messages" element={
+              <AuthGuard>
+                <ManageMessages />
+              </AuthGuard>
+            } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

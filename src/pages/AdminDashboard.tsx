@@ -15,10 +15,10 @@ type JwtPayload = {
 export const isTokenExpired = (token: string): boolean => {
   try {
     const decoded = jwtDecode<JwtPayload>(token);
-    const currentTime = Date.now() / 1000; // بالثواني
+    const currentTime = Date.now() / 1000;
     return decoded.exp < currentTime;
   } catch {
-    return true; // token invalid
+    return true; 
   }
 };
 
