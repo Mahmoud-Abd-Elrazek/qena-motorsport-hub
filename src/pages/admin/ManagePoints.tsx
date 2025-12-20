@@ -72,7 +72,7 @@ const ManagePoints = () => {
   const fetchMembers = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch("http://qenaracingteam.runasp.net/Racing/Member/GetAllMemberPoinsts");
+      const response = await fetch("https://qenaracingteam.runasp.net/Racing/Member/GetAllMemberPoinsts");
       const result = await response.json();
 
       if (result.isSuccess) {
@@ -90,7 +90,7 @@ const ManagePoints = () => {
   const fetchHistory = async () => {
     try {
       setIsHistoryLoading(true);
-      const response = await fetch("http://qenaracingteam.runasp.net/Racing/Member/GetMembersPointHistory");
+      const response = await fetch("https://qenaracingteam.runasp.net/Racing/Member/GetMembersPointHistory");
       const result = await response.json();
       if (result.isSuccess) {
         setHistory(result.data);
@@ -151,7 +151,7 @@ const ManagePoints = () => {
     try {
       setIsSubmitting(true);
 
-      const response = await fetch("http://qenaracingteam.runasp.net/Racing/Member/AddPointsToMemeber", {
+      const response = await fetch("https://qenaracingteam.runasp.net/Racing/Member/AddPointsToMemeber", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

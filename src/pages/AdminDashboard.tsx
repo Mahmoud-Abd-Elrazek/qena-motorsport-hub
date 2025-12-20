@@ -18,7 +18,7 @@ export const isTokenExpired = (token: string): boolean => {
     const currentTime = Date.now() / 1000;
     return decoded.exp < currentTime;
   } catch {
-    return true; 
+    return true;
   }
 };
 
@@ -32,7 +32,7 @@ const AdminDashboard = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://qenaracingteam.runasp.net/Racing/Authentication/Login", {
+      const response = await fetch("https://qenaracingteam.runasp.net/Racing/Authentication/Login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -50,6 +50,7 @@ const AdminDashboard = () => {
       }
 
       const data = await response.json();
+      console.log("data: ", data)
       const token = data.data;
       if (token) {
         localStorage.setItem("token", token);

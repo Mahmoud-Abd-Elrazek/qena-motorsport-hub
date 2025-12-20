@@ -65,7 +65,7 @@ const ManageMembers = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://qenaracingteam.runasp.net/Racing/Member/DeleteMember/${memberToDelete.id}`, {
+      const response = await fetch(`https://qenaracingteam.runasp.net/Racing/Member/DeleteMember/${memberToDelete.id}`, {
         method: "DELETE",
         headers: { "Authorization": `Bearer ${token}` },
       });
@@ -91,7 +91,7 @@ const ManageMembers = () => {
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch("http://qenaracingteam.runasp.net/Racing/Member/GetAllMembers", {
+      const response = await fetch("https://qenaracingteam.runasp.net/Racing/Member/GetAllMembers", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -149,7 +149,7 @@ const ManageMembers = () => {
     if (!confirm("هل أنت متأكد من حذف هذا العضو؟")) return;
     try {
       const token = localStorage.getItem("token");
-      await fetch(`http://qenaracingteam.runasp.net/Racing/Member/DeleteMember/${id}`, {
+      await fetch(`https://qenaracingteam.runasp.net/Racing/Member/DeleteMember/${id}`, {
         method: "DELETE",
         headers: { "Authorization": `Bearer ${token}` },
       });
@@ -185,8 +185,8 @@ const ManageMembers = () => {
       setIsLoading(true);
 
       const url = editingMember
-        ? "http://qenaracingteam.runasp.net/Racing/Member/UpdateMember"
-        : "http://qenaracingteam.runasp.net/Racing/Member/AddMember";
+        ? "https://qenaracingteam.runasp.net/Racing/Member/UpdateMember"
+        : "https://qenaracingteam.runasp.net/Racing/Member/AddMember";
 
       const response = await fetch(url, {
         method: editingMember ? "PUT" : "POST",

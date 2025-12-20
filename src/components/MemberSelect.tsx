@@ -59,7 +59,7 @@ export default function ProfessionalMemberSelect({ members, formData, setFormDat
 
     try {
       setIsLoading(true);
-      const url = "http://qenaracingteam.runasp.net/Racing/Member/AddMember";
+      const url = "https://qenaracingteam.runasp.net/Racing/Member/AddMember";
 
       const response = await fetch(url, {
         method: "POST",
