@@ -292,13 +292,12 @@ const ManagePoints = () => {
                       <TableHead className="text-right">اسم العضو</TableHead>
                       <TableHead className="text-center">النقاط</TableHead>
                       <TableHead className="text-right">السبب</TableHead>
-                      <TableHead className="w-[50px]"></TableHead> {/* عمود الحذف */}
+                      <TableHead className="w-[50px]"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {history.length === 0 ? (
                       <TableRow>
-                        {/* تم تعديل colSpan إلى 5 ليناسب الأعمدة الجديدة */}
                         <TableCell colSpan={5} className="text-center py-10 text-muted-foreground">
                           لا توجد عمليات مسجلة حالياً
                         </TableCell>
@@ -309,7 +308,7 @@ const ManagePoints = () => {
                           <TableCell className="text-muted-foreground font-medium text-sm">
                             {formatToDMY(transaction.changeTime)}
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="font-medium">
                             {transaction.memberName}
                           </TableCell>
                           <TableCell className="text-center">
@@ -320,12 +319,12 @@ const ManagePoints = () => {
                               {transaction.pointsChanged > 0 ? (
                                 <>
                                   <TrendingUp className="w-3.5 h-3.5" />
-                                  <span>+{transaction.pointsChanged}</span>
+                                  <span className="font-medium">+{transaction.pointsChanged}</span>
                                 </>
                               ) : (
                                 <>
                                   <TrendingDown className="w-3.5 h-3.5" />
-                                  <span>{transaction.pointsChanged}</span>
+                                  <span className="font-medium">{transaction.pointsChanged}</span>
                                 </>
                               )}
                             </div>
@@ -370,14 +369,14 @@ const ManagePoints = () => {
               <TableBody>
                 {[...members].sort((a, b) => b.points - a.points).map((m, i) => (
                   <TableRow key={m.memberId}>
-                    <TableCell className="text-center">{i + 1}</TableCell>
-                    <TableCell>{m.memberName}</TableCell>
+                    <TableCell className="text-center font-medium">{i + 1}</TableCell>
+                    <TableCell className="font-medium">{m.memberName}</TableCell>
                     <TableCell>
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                         {m.role || "Member"}
                       </span>
                     </TableCell>
-                    <TableCell className="text-center font-bold text-primary">{m.points}</TableCell>
+                    <TableCell className="text-center font-medium text-primary">{m.points}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
