@@ -116,10 +116,10 @@ export default function ProfessionalMemberSelect({ members, formData, setFormDat
           </Button>
         </PopoverTrigger>
 
-        <PopoverContent className="w-[450px] p-0 shadow-xl" align="start">
+        <PopoverContent className="w-[100%] p-0 shadow-xl" align="start">
           <Command>
             <CommandInput placeholder="اكتب اسم العضو للبحث..." className="h-11" />
-            <CommandList className="max-h-[300px] overflow-y-auto custom-scrollbar">
+            <CommandList className="max-h-[300px] overflow-y-auto custom-scrollbar" onWheel={(e) => e.stopPropagation()}>
               <CommandEmpty className="py-6 text-center">
                 <p className="text-sm text-muted-foreground mb-3">العضو غير موجود.</p>
                 <Button
