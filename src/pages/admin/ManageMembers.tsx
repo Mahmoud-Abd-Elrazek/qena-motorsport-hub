@@ -107,7 +107,8 @@ const ManageMembers = () => {
       }
 
       const data = await response.json();
-      const mappedMembers: Member[] = data.data.map((m) => ({
+      const list = Array.isArray(data.data) ? data.data : [];
+      const mappedMembers: Member[] = list.map((m) => ({
         id: m.id,
         name: m.name,
         role: m.role,
@@ -119,7 +120,7 @@ const ManageMembers = () => {
       }));
 
       setMembers(prev => (pageNumber === 1 ? mappedMembers : [...prev, ...mappedMembers]));
-      setHasMore(mappedMembers.length === 10); // افترضنا أن pageSize هو 10
+      setHasMore(mappedMembers.length === 10);
     } catch (error) {
       toast.error("فشل في تحميل الأعضاء");
     } finally {
@@ -239,7 +240,7 @@ const ManageMembers = () => {
                   <TableHead className="text-right">العضو</TableHead>
                   <TableHead className="text-right">الدور</TableHead>
                   <TableHead className="text-center">النقاط</TableHead>
-                  <TableHead className="text-left font-bold">الإجراءات</TableHead>
+                  <TableHead className="text-right font-bold">الإجراءات</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

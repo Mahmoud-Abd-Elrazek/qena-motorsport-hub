@@ -226,7 +226,7 @@ const AdminDashboard = () => {
             </CardContent>
           </Card>
 
-          <Card>
+          {/* <Card>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -238,7 +238,7 @@ const AdminDashboard = () => {
                 </div>
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
         </div>
 
         {/* Management Sections */}
@@ -294,7 +294,7 @@ const AdminDashboard = () => {
             </CardContent>
           </Card>
 
-          <Card>
+          {/* <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Mail className="h-5 w-5" />
@@ -309,7 +309,7 @@ const AdminDashboard = () => {
                 عرض الرسائل
               </Button>
             </CardContent>
-          </Card>
+          </Card> */}
         </div>
 
         {/* Demo Note */}
@@ -319,10 +319,6 @@ const AdminDashboard = () => {
             <p className="text-sm text-muted-foreground leading-relaxed">
               هذه النسخة التجريبية من لوحة التحكم. للحصول على نظام إدارة كامل مع backend API، يمكنك:
             </p>
-            <ul className="mt-3 space-y-1 text-sm text-muted-foreground mr-6">
-              <li className="list-disc">استخدام <strong>Lovable Cloud</strong> للحصول على backend جاهز (PostgreSQL + JWT)</li>
-              <li className="list-disc">أو ربط التطبيق مع ASP.NET Core API الخاص بك</li>
-            </ul>
           </CardContent>
         </Card>
       </main>
