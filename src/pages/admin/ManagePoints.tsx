@@ -405,7 +405,7 @@ const ManagePoints = () => {
                 ))}
               </select>
             </div> */}
-            <MemberSelect members={members} formData={formData} setFormData={setFormData} />
+            <MemberSelect members={members} formData={formData} setFormData={setFormData} fetchMembers={fetchMembers} />
             <div className="grid gap-2">
               <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">النقاط<span className="text-destructive">*</span>
               </label>
