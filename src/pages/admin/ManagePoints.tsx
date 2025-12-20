@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import MemberSelect from "@/components/MemberSelect";
 import {
   Table,
   TableBody,
@@ -161,7 +162,6 @@ const ManagePoints = () => {
       });
 
       const result = await response.json();
-      console.log(result)
 
       if (result.isSuccess) {
         toast.success(
@@ -393,7 +393,7 @@ const ManagePoints = () => {
             <DialogTitle>إضافة نقاط</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
+            {/* <div className="grid gap-2">
               <Label>اختر العضو *</Label>
               <select
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -405,14 +405,17 @@ const ManagePoints = () => {
                   <option key={m.memberId} value={m.memberId}>{m.memberName}</option>
                 ))}
               </select>
-            </div>
+            </div> */}
+            <MemberSelect members={members} formData={formData} setFormData={setFormData} />
             <div className="grid gap-2">
-              <Label>النقاط</Label>
+              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">النقاط<span className="text-destructive">*</span>
+              </label>
               <Input type="number" onChange={(e) => setFormData({ ...formData, points: parseInt(e.target.value) || 0 })} />
             </div>
             <div className="grid gap-2">
-              <Label>السبب</Label>
-              <Textarea onChange={(e) => setFormData({ ...formData, reason: e.target.value })} />
+              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                ذكر السبب <span className="text-destructive">*</span>
+              </label>              <Textarea onChange={(e) => setFormData({ ...formData, reason: e.target.value })} />
             </div>
           </div>
           <DialogFooter>
