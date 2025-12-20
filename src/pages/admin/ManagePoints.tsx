@@ -21,8 +21,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ArrowRight, Plus, Trophy, Loader2, TrendingDown, TrendingUp, Trash2 } from "lucide-react"; // أضفنا Loader2 للتحميل
+import { ArrowRight, Plus, Trophy, Loader2, TrendingDown, TrendingUp, Trash2, RefreshCw } from "lucide-react"; // أضفنا Loader2 للتحميل
 import { toast } from "sonner";
+import { resourceUsage } from "process";
 
 // تعريف شكل العضو من الـ API
 interface Member {
@@ -41,6 +42,15 @@ interface PointTransaction {
   date: string;
 }
 
+interface PointHistory {
+  memberId: number;
+  memberName: string;
+  pointsChanged: number;
+  reason: string | null;
+  changeTime: string;
+  pointHistoryId: number
+}
+
 const ManagePoints = () => {
   const navigate = useNavigate();
 
@@ -55,6 +65,8 @@ const ManagePoints = () => {
     reason: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [history, setHistory] = useState<PointHistory[]>([]); // السجل من الـ API
+  const [isHistoryLoading, setIsHistoryLoading] = useState(false);
 
   const fetchMembers = async () => {
     try {
@@ -74,47 +86,45 @@ const ManagePoints = () => {
     }
   };
 
+  const fetchHistory = async () => {
+    try {
+      setIsHistoryLoading(true);
+      const response = await fetch("http://qenaracingteam.runasp.net/Racing/Member/GetMembersPointHistory");
+      const result = await response.json();
+      if (result.isSuccess) {
+        setHistory(result.data);
+      }
+    } catch (error) {
+      console.error("Error fetching history:", error);
+    } finally {
+      setIsHistoryLoading(false);
+    }
+  };
+
+  function formatToDMY(dateString) {
+    const date = new Date(dateString);
+
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+
+    return `${day} / ${month} / ${year}`;
+  }
+
+
   useEffect(() => {
-    fetchMembers();
+    const loadAllData = async () => {
+      setIsLoading(true);
+      await Promise.all([fetchMembers(), fetchHistory()]);
+      setIsLoading(false);
+    };
+    loadAllData();
   }, []);
 
-  // const handleSave = () => {
-  //   if (!formData.memberId || formData.points === 0 || !formData.reason) {
-  //     toast.error("يرجى ملء جميع الحقول");
-  //     return;
-  //   }
-
-  //   const member = members.find((m) => m.memberId === parseInt(formData.memberId));
-  //   if (!member) {
-  //     toast.error("العضو غير موجود");
-  //     return;
-  //   }
-
-  //   const newTransaction: PointTransaction = {
-  //     id: Date.now().toString(),
-  //     memberId: member.memberId,
-  //     memberName: member.memberName,
-  //     points: formData.points,
-  //     reason: formData.reason,
-  //     date: new Date().toISOString().split("T")[0],
-  //   };
-
-  //   setTransactions([newTransaction, ...transactions]);
-
-  //   // ملاحظة: هنا المفروض تبعت الـ Transaction للباك اند بـ POST Request
-  //   // حالياً هنحدث الـ UI فقط
-  //   const updatedMembers = members.map(m => 
-  //     m.memberId === member.memberId ? { ...m, points: m.points + formData.points } : m
-  //   );
-  //   setMembers(updatedMembers);
-
-  //   toast.success("تم إضافة النقاط بنجاح");
-  //   setIsDialogOpen(false);
-  // };
   // حذف عملية واحدة
-  const deleteTransaction = (id: string) => {
-    const updatedTransactions = transactions.filter((t) => t.id !== id);
-    setTransactions(updatedTransactions);
+  const deleteTransaction = (id: number) => {
+    const updatedTransactions = history.filter((t) => t.pointHistoryId !== id);
+    setHistory(updatedTransactions);
     localStorage.setItem("racing_transactions", JSON.stringify(updatedTransactions));
     toast.success("تم حذف العملية من السجل المحلي");
   };
@@ -129,13 +139,11 @@ const ManagePoints = () => {
   };
 
   const handleSave = async () => {
-    // التحقق من البيانات (زي ما عملنا قبل كدة)
     if (!formData.memberId || formData.points === 0 || !formData.reason) {
       toast.error("يرجى ملء جميع الحقول");
       return;
     }
 
-    // إيجاد العضو المختار عشان نستخدم اسمه في الـ Toast
     const member = members.find((m) => m.memberId === parseInt(formData.memberId));
     if (!member) return;
 
@@ -153,8 +161,8 @@ const ManagePoints = () => {
       });
 
       const result = await response.json();
+      console.log(result)
 
-      // هناااااا تحط الكود بتاعك 👇
       if (result.isSuccess) {
         toast.success(
           <div className="flex flex-col">
@@ -165,27 +173,28 @@ const ManagePoints = () => {
           </div>
         );
 
-        // بقية العمليات (تحديث الـ state وإغلاق الديالوج)
+        // await Promise.all([fetchMembers(), fetchHistory()]);
+
         const updatedMembers = members.map((m) =>
           m.memberId === member.memberId ? { ...m, points: m.points + formData.points } : m
         );
         setMembers(updatedMembers);
 
         // إضافة للعمليات المحلية
-        const newTransaction = {
-          id: Date.now().toString(),
+        const newHistory: PointHistory = {
           memberId: member.memberId,
           memberName: member.memberName,
-          points: formData.points,
-          reason: formData.reason,
-          date: new Date().toLocaleDateString(),
+          pointsChanged: formData.points,
+          reason: formData.reason || null,
+          changeTime: new Date().toISOString(),
+          pointHistoryId: Date.now(),
         };
-        setTransactions([newTransaction, ...transactions]);
+        setHistory([newHistory, ...history]);
 
         setIsDialogOpen(false);
         setFormData({ memberId: "", points: 0, reason: "" });
       } else {
-        toast.error(result.message);
+        toast.error(formData.points > 2147483647 || formData.points < -2147483648 ? "Points Overflow" : result.message);
       }
     } catch (error) {
       toast.error("حدث خطأ في الاتصال بالسيرفر");
@@ -253,28 +262,29 @@ const ManagePoints = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>سجل النقاط </CardTitle>
-            <Button onClick={() => setIsDialogOpen(true)}>
-              <Plus className="ml-2 h-4 w-4" /> إضافة نقاط
-            </Button>
+            <div className="flex flex-row items-center justify-between gap-2">
+              <Button onClick={() => setIsDialogOpen(true)}>
+                <Plus className="ml-2 h-4 w-4" /> إضافة نقاط
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
+            {/* زر مسح الكل يظهر فوق الجدول */}
+            {history.length > 0 && (
+              <div className="flex justify-end">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearAllTransactions}
+                  className="text-destructive hover:bg-destructive/100 gap-2"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  مسح السجل بالكامل
+                </Button>
+              </div>
+            )}
             <div className="max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-primary/20">
               <div className="space-y-4">
-                {/* زر مسح الكل يظهر فوق الجدول */}
-                {transactions.length > 0 && (
-                  <div className="flex justify-end">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={clearAllTransactions}
-                      className="text-destructive hover:bg-destructive/100 gap-2"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      مسح السجل بالكامل
-                    </Button>
-                  </div>
-                )}
-
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -286,7 +296,7 @@ const ManagePoints = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {transactions.length === 0 ? (
+                    {history.length === 0 ? (
                       <TableRow>
                         {/* تم تعديل colSpan إلى 5 ليناسب الأعمدة الجديدة */}
                         <TableCell colSpan={5} className="text-center py-10 text-muted-foreground">
@@ -294,28 +304,28 @@ const ManagePoints = () => {
                         </TableCell>
                       </TableRow>
                     ) : (
-                      transactions.map((transaction) => (
-                        <TableRow key={transaction.id} className="hover:bg-muted/30 transition-colors group">
+                      history.map((transaction, idx) => (
+                        <TableRow key={idx} className="hover:bg-muted/30 transition-colors group">
                           <TableCell className="text-muted-foreground font-medium text-sm">
-                            {transaction.date}
+                            {formatToDMY(transaction.changeTime)}
                           </TableCell>
-                          <TableCell className="font-bold">
+                          <TableCell>
                             {transaction.memberName}
                           </TableCell>
                           <TableCell className="text-center">
-                            <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-black border ${transaction.points > 0
-                                ? "bg-green-50 text-green-600 border-green-200"
-                                : "bg-red-50 text-red-600 border-red-200"
+                            <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-black border ${transaction.pointsChanged > 0
+                              ? "bg-green-50 text-green-600 border-green-200"
+                              : "bg-red-50 text-red-600 border-red-200"
                               }`}>
-                              {transaction.points > 0 ? (
+                              {transaction.pointsChanged > 0 ? (
                                 <>
                                   <TrendingUp className="w-3.5 h-3.5" />
-                                  <span>+{transaction.points}</span>
+                                  <span>+{transaction.pointsChanged}</span>
                                 </>
                               ) : (
                                 <>
                                   <TrendingDown className="w-3.5 h-3.5" />
-                                  <span>{transaction.points}</span>
+                                  <span>{transaction.pointsChanged}</span>
                                 </>
                               )}
                             </div>
@@ -328,7 +338,7 @@ const ManagePoints = () => {
                             <Button
                               variant="ghost"
                               size="icon"
-                              onClick={() => deleteTransaction(transaction.id)}
+                              onClick={() => deleteTransaction(transaction.pointHistoryId)}
                               className="h-8 w-8 text-muted-foreground hover:bg-destructive/100 transition-opacity"
                             >
                               <Trash2 className="h-4 w-4" />
@@ -396,7 +406,6 @@ const ManagePoints = () => {
                 ))}
               </select>
             </div>
-            {/* باقي الـ inputs (النقاط والسبب) زي ما هي */}
             <div className="grid gap-2">
               <Label>النقاط</Label>
               <Input type="number" onChange={(e) => setFormData({ ...formData, points: parseInt(e.target.value) || 0 })} />
