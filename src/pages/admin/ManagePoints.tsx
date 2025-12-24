@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"; // أضفنا useEffect
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,25 +22,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ArrowRight, Plus, Trophy, Loader2, TrendingDown, TrendingUp, Trash2, RefreshCw } from "lucide-react"; // أضفنا Loader2 للتحميل
+import { ArrowRight, Plus, Trophy, Loader2, TrendingDown, TrendingUp, Trash2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
-import { resourceUsage } from "process";
 
-// تعريف شكل العضو من الـ API
+// Interfaces
 interface Member {
   memberId: number;
   memberName: string;
   role: string | null;
   points: number;
-}
-
-interface PointTransaction {
-  id: string;
-  memberId: number;
-  memberName: string;
-  points: number;
-  reason: string;
-  date: string;
 }
 
 interface PointHistory {
@@ -49,16 +39,15 @@ interface PointHistory {
   pointsChanged: number;
   reason: string | null;
   changeTime: string;
-  pointHistoryId: number
+  pointHistoryId: number;
 }
 
 const ManagePoints = () => {
   const navigate = useNavigate();
 
-  // States الجديدة
+  // States
   const [members, setMembers] = useState<Member[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [transactions, setTransactions] = useState<PointTransaction[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     memberId: "",
@@ -66,24 +55,21 @@ const ManagePoints = () => {
     reason: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [history, setHistory] = useState<PointHistory[]>([]); // السجل من الـ API
+  const [history, setHistory] = useState<PointHistory[]>([]);
   const [isHistoryLoading, setIsHistoryLoading] = useState(false);
+  
+  // States للـ Delete
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false); // مسح السجل بالكامل
+  const [isSingleDeleteDialogOpen, setIsSingleDeleteDialogOpen] = useState(false); // حذف عملية واحدة
+  const [idToDelete, setIdToDelete] = useState<number | null>(null); // الـ ID المطلوب حذفه حالياً
 
   const fetchMembers = async () => {
     try {
-      setIsLoading(true);
       const response = await fetch("https://qenaracingteam.runasp.net/Racing/Member/GetAllMemberPoinsts");
       const result = await response.json();
-
-      if (result.isSuccess) {
-        setMembers(result.data);
-      } else {
-        toast.error("فشل في تحميل البيانات: " + result.message);
-      }
+      if (result.isSuccess) setMembers(result.data);
     } catch (error) {
-      toast.error("حدث خطأ في الاتصال بالسيرفر");
-    } finally {
-      setIsLoading(false);
+      toast.error("حدث خطأ في تحديث بيانات الأعضاء");
     }
   };
 
@@ -92,26 +78,13 @@ const ManagePoints = () => {
       setIsHistoryLoading(true);
       const response = await fetch("https://qenaracingteam.runasp.net/Racing/Member/GetMembersPointHistory");
       const result = await response.json();
-      if (result.isSuccess) {
-        setHistory(result.data);
-      }
+      if (result.isSuccess) setHistory(result.data);
     } catch (error) {
       console.error("Error fetching history:", error);
     } finally {
       setIsHistoryLoading(false);
     }
   };
-
-  function formatToDMY(dateString) {
-    const date = new Date(dateString);
-
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const year = date.getFullYear();
-
-    return `${day} / ${month} / ${year}`;
-  }
-
 
   useEffect(() => {
     const loadAllData = async () => {
@@ -122,20 +95,61 @@ const ManagePoints = () => {
     loadAllData();
   }, []);
 
-  // حذف عملية واحدة
-  const deleteTransaction = (id: number) => {
-    const updatedTransactions = history.filter((t) => t.pointHistoryId !== id);
-    setHistory(updatedTransactions);
-    localStorage.setItem("racing_transactions", JSON.stringify(updatedTransactions));
-    toast.success("تم حذف العملية من السجل المحلي");
+  function formatToDMY(dateString: string) {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day} / ${month} / ${year}`;
+  }
+
+  // --- منطق حذف عملية واحدة باستخدام الـ ID ---
+  const handleSingleDelete = async () => {
+    if (!idToDelete) return;
+    
+    try {
+      setIsSubmitting(true);
+      const response = await fetch(
+        `https://qenaracingteam.runasp.net/Racing/Member/DeletePointHistoryById?id=${idToDelete}`,
+        { method: "DELETE" }
+      );
+      const result = await response.json();
+
+      if (result.isSuccess) {
+        toast.success("تم حذف العملية بنجاح");
+        // تحديث الواجهة فوراً
+        setHistory(history.filter(t => t.pointHistoryId !== idToDelete));
+        fetchMembers(); // لتحديث النقاط في الكروت
+      } else {
+        toast.error("فشل الحذف: " + result.message);
+      }
+    } catch (error) {
+      toast.error("خطأ في الاتصال بالسيرفر");
+    } finally {
+      setIsSubmitting(false);
+      setIsSingleDeleteDialogOpen(false);
+      setIdToDelete(null);
+    }
   };
 
-  // مسح السجل بالكامل
-  const clearAllTransactions = () => {
-    if (window.confirm("هل أنت متأكد من مسح سجل العمليات بالكامل؟")) {
-      setTransactions([]);
-      localStorage.removeItem("racing_transactions");
-      toast.success("تم مسح السجل بالكامل");
+  // --- مسح السجل بالكامل ---
+  const clearAllTransactions = async () => {
+    try {
+      setIsSubmitting(true);
+      const response = await fetch("https://qenaracingteam.runasp.net/Racing/Member/ClearAllPointHistory", {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        setHistory([]);
+        fetchMembers();
+        toast.success("تم مسح السجل بالكامل");
+      }
+    } catch (error) {
+      toast.error("حدث خطأ أثناء مسح السجل");
+    } finally {
+      setIsSubmitting(false);
+      setIsDeleteDialogOpen(false);
     }
   };
 
@@ -144,13 +158,8 @@ const ManagePoints = () => {
       toast.error("يرجى ملء جميع الحقول");
       return;
     }
-
-    const member = members.find((m) => m.memberId === parseInt(formData.memberId));
-    if (!member) return;
-
     try {
       setIsSubmitting(true);
-
       const response = await fetch("https://qenaracingteam.runasp.net/Racing/Member/AddPointsToMemeber", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -160,41 +169,12 @@ const ManagePoints = () => {
           reason: formData.reason,
         }),
       });
-
       const result = await response.json();
-
       if (result.isSuccess) {
-        toast.success(
-          <div className="flex flex-col">
-            <span className="font-bold text-right">تم التحديث بنجاح!</span>
-            <span className={`text-sm text-right ${formData.points > 0 ? "text-green-600" : "text-red-600"}`}>
-              تم {formData.points > 0 ? "إضافة" : "خصم"} {Math.abs(formData.points)} نقطة لـ {member.memberName}
-            </span>
-          </div>
-        );
-
-        // await Promise.all([fetchMembers(), fetchHistory()]);
-
-        const updatedMembers = members.map((m) =>
-          m.memberId === member.memberId ? { ...m, points: m.points + formData.points } : m
-        );
-        setMembers(updatedMembers);
-
-        // إضافة للعمليات المحلية
-        const newHistory: PointHistory = {
-          memberId: member.memberId,
-          memberName: member.memberName,
-          pointsChanged: formData.points,
-          reason: formData.reason || null,
-          changeTime: new Date().toISOString(),
-          pointHistoryId: Date.now(),
-        };
-        setHistory([newHistory, ...history]);
-
+        toast.success("تم التحديث بنجاح!");
+        await Promise.all([fetchMembers(), fetchHistory()]);
         setIsDialogOpen(false);
         setFormData({ memberId: "", points: 0, reason: "" });
-      } else {
-        toast.error(formData.points > 2147483647 || formData.points < -2147483648 ? "Points Overflow" : result.message);
       }
     } catch (error) {
       toast.error("حدث خطأ في الاتصال بالسيرفر");
@@ -207,7 +187,7 @@ const ManagePoints = () => {
     return (
       <div className="h-screen w-full flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="mr-2">جاري تحميل البيانات...</span>
+        <span className="mr-2 font-bold">جاري تحميل البيانات...</span>
       </div>
     );
   }
@@ -226,7 +206,7 @@ const ManagePoints = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8 space-y-6">
-        {/* Top Members */}
+        {/* Top Members Cards */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -256,99 +236,73 @@ const ManagePoints = () => {
           </CardContent>
         </Card>
 
-        {/* سجل النقاط و جدول الأعضاء بنفس الطريقة السابقة مع تغيير المسميات */}
-        {/* ... بقية الـ Table Components باستخدام member.memberName و member.memberId ... */}
-
+        {/* سجل النقاط */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>سجل النقاط </CardTitle>
-            <div className="flex flex-row items-center justify-between gap-2">
-              <Button onClick={() => setIsDialogOpen(true)}>
-                <Plus className="ml-2 h-4 w-4" /> إضافة نقاط
-              </Button>
-            </div>
+            <CardTitle>سجل النقاط</CardTitle>
+            <Button onClick={() => setIsDialogOpen(true)}>
+              <Plus className="ml-2 h-4 w-4" /> إضافة نقاط
+            </Button>
           </CardHeader>
           <CardContent>
-            {/* زر مسح الكل يظهر فوق الجدول */}
             {history.length > 0 && (
-              <div className="flex justify-end">
+              <div className="flex justify-end mb-4">
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={clearAllTransactions}
-                  className="text-destructive hover:bg-destructive/100 gap-2"
+                  onClick={() => setIsDeleteDialogOpen(true)}
+                  className="text-destructive hover:bg-destructive/10 gap-2"
                 >
-                  <Trash2 className="h-4 w-4" />
-                  مسح السجل بالكامل
+                  <Trash2 className="h-4 w-4" /> مسح السجل بالكامل
                 </Button>
               </div>
             )}
-            <div className="max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-primary/20">
-              <div className="space-y-4">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="text-right">التاريخ</TableHead>
-                      <TableHead className="text-right">اسم العضو</TableHead>
-                      <TableHead className="text-center">النقاط</TableHead>
-                      <TableHead className="text-right">السبب</TableHead>
-                      <TableHead className="w-[50px]"></TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {history.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={5} className="text-center py-10 text-muted-foreground">
-                          لا توجد عمليات مسجلة حالياً
+            <div className="max-h-[400px] overflow-y-auto pr-2 scrollbar-thin">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-right">التاريخ</TableHead>
+                    <TableHead className="text-right">الاسم</TableHead>
+                    <TableHead className="text-center">النقاط</TableHead>
+                    <TableHead className="text-right">السبب</TableHead>
+                    <TableHead className="w-[50px]"></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {isHistoryLoading ? (
+                    <TableRow><TableCell colSpan={5} className="text-center py-4"><Loader2 className="animate-spin mx-auto" /></TableCell></TableRow>
+                  ) : history.length === 0 ? (
+                    <TableRow><TableCell colSpan={5} className="text-center py-10">لا توجد عمليات</TableCell></TableRow>
+                  ) : (
+                    history.map((transaction) => (
+                      <TableRow key={transaction.pointHistoryId} className="group">
+                        <TableCell className="text-xs text-muted-foreground">{formatToDMY(transaction.changeTime)}</TableCell>
+                        <TableCell className="font-medium">{transaction.memberName}</TableCell>
+                        <TableCell className="text-center">
+                          <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold border ${transaction.pointsChanged > 0 ? "bg-green-50 text-green-600 border-green-200" : "bg-red-50 text-red-600 border-red-200"}`}>
+                            {transaction.pointsChanged > 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                            {transaction.pointsChanged > 0 ? `+${transaction.pointsChanged}` : transaction.pointsChanged}
+                          </span>
+                        </TableCell>
+                        <TableCell className="max-w-[150px] truncate italic text-sm">{transaction.reason}</TableCell>
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                              setIdToDelete(transaction.pointHistoryId);
+                              setIsSingleDeleteDialogOpen(true);
+                            }}
+                            className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </TableCell>
                       </TableRow>
-                    ) : (
-                      history.map((transaction, idx) => (
-                        <TableRow key={idx} className="hover:bg-muted/30 transition-colors group">
-                          <TableCell className="text-muted-foreground font-medium text-sm">
-                            {formatToDMY(transaction.changeTime)}
-                          </TableCell>
-                          <TableCell className="font-medium">
-                            {transaction.memberName}
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-black border ${transaction.pointsChanged > 0
-                              ? "bg-green-50 text-green-600 border-green-200"
-                              : "bg-red-50 text-red-600 border-red-200"
-                              }`}>
-                              {transaction.pointsChanged > 0 ? (
-                                <>
-                                  <TrendingUp className="w-3.5 h-3.5" />
-                                  <span className="font-medium">+{transaction.pointsChanged}</span>
-                                </>
-                              ) : (
-                                <>
-                                  <TrendingDown className="w-3.5 h-3.5" />
-                                  <span className="font-medium">{transaction.pointsChanged}</span>
-                                </>
-                              )}
-                            </div>
-                          </TableCell>
-                          <TableCell className="max-w-[200px] truncate text-muted-foreground italic">
-                            {transaction.reason}
-                          </TableCell>
-                          <TableCell>
-                            {/* زر حذف عنصر واحد - يظهر بشكل أوضح عند عمل Hover على الصف */}
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => deleteTransaction(transaction.pointHistoryId)}
-                              className="h-8 w-8 text-muted-foreground hover:bg-destructive/100 transition-opacity"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
             </div>
           </CardContent>
         </Card>
@@ -367,16 +321,12 @@ const ManagePoints = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {[...members].sort((a, b) => b.points - a.points).map((m, i) => (
+                {members.sort((a, b) => b.points - a.points).map((m, i) => (
                   <TableRow key={m.memberId}>
                     <TableCell className="text-center font-medium">{i + 1}</TableCell>
                     <TableCell className="font-medium">{m.memberName}</TableCell>
-                    <TableCell>
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        {m.role || "Member"}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-center font-medium text-primary">{m.points}</TableCell>
+                    <TableCell><span className="px-2 py-0.5 rounded-full text-xs bg-blue-100 text-blue-800">{m.role || "Member"}</span></TableCell>
+                    <TableCell className="text-center font-bold text-primary">{m.points}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -385,56 +335,72 @@ const ManagePoints = () => {
         </Card>
       </main>
 
-      {/* Dialog */}
+      {/* --- Dialogs --- */}
+
+      {/* 1. إضافة نقاط */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
-          <DialogHeader>
-            <DialogTitle>إضافة نقاط</DialogTitle>
-          </DialogHeader>
+          <DialogHeader><DialogTitle>إضافة نقاط للعضو</DialogTitle></DialogHeader>
           <div className="grid gap-4 py-4">
-            {/* <div className="grid gap-2">
-              <Label>اختر العضو *</Label>
-              <select
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                value={formData.memberId}
-                onChange={(e) => setFormData({ ...formData, memberId: e.target.value })}
-              >
-                <option value="">-- اختر عضو --</option>
-                {members.map((m) => (
-                  <option key={m.memberId} value={m.memberId}>{m.memberName}</option>
-                ))}
-              </select>
-            </div> */}
             <MemberSelect members={members} formData={formData} setFormData={setFormData} fetchMembers={fetchMembers} />
             <div className="grid gap-2">
-              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">النقاط<span className="text-destructive">*</span>
-              </label>
+              <Label>النقاط</Label>
               <Input type="number" onChange={(e) => setFormData({ ...formData, points: parseInt(e.target.value) || 0 })} />
             </div>
             <div className="grid gap-2">
-              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                ذكر السبب <span className="text-destructive">*</span>
-              </label>              <Textarea onChange={(e) => setFormData({ ...formData, reason: e.target.value })} />
+              <Label>السبب</Label>
+              <Textarea onChange={(e) => setFormData({ ...formData, reason: e.target.value })} />
             </div>
           </div>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsDialogOpen(false)}
-              disabled={isSubmitting}
-            >
-              إلغاء
-            </Button>
-
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>إلغاء</Button>
             <Button onClick={handleSave} disabled={isSubmitting}>
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="ml-2 h-4 w-4 animate-spin" />
-                  جاري الحفظ...
-                </>
-              ) : (
-                "حفظ النقاط"
-              )}
+              {isSubmitting ? <Loader2 className="animate-spin" /> : "حفظ النقاط"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 2. تأكيد حذف عملية واحدة */}
+      <Dialog open={isSingleDeleteDialogOpen} onOpenChange={setIsSingleDeleteDialogOpen}>
+        <DialogContent className="max-w-[400px]">
+          <div className="flex flex-col items-center text-center p-4">
+            <div className="h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
+              <Trash2 className="h-6 w-6 text-destructive" />
+            </div>
+            <DialogHeader>
+              <DialogTitle className="text-center">تأكيد حذف العملية</DialogTitle>
+              <DialogDescription className="text-center">
+                هل أنت متأكد من حذف هذه العملية من السجل؟<br/>
+                <span className="text-xs text-destructive">سيتم تعديل نقاط العضو تلقائياً بعد الحذف.</span>
+              </DialogDescription>
+            </DialogHeader>
+          </div>
+          <DialogFooter className="gap-2 sm:justify-center">
+            <Button variant="ghost" onClick={() => setIsSingleDeleteDialogOpen(false)} disabled={isSubmitting}>إلغاء</Button>
+            <Button variant="destructive" onClick={handleSingleDelete} disabled={isSubmitting}>
+              {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "نعم، احذف"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 3. تأكيد مسح الكل */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="max-w-[400px]">
+          <div className="flex flex-col items-center text-center p-4">
+            <div className="h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
+              <AlertTriangle className="h-6 w-6 text-destructive" />
+            </div>
+            <DialogHeader>
+              <DialogTitle className="text-center">مسح السجل بالكامل</DialogTitle>
+              <DialogDescription className="text-center">هذا الإجراء سيقوم بحذف جميع العمليات نهائياً.</DialogDescription>
+            </DialogHeader>
+          </div>
+          <DialogFooter className="gap-2 sm:justify-center">
+            <Button variant="ghost" onClick={() => setIsDeleteDialogOpen(false)}>إلغاء</Button>
+            <Button variant="destructive" onClick={clearAllTransactions} disabled={isSubmitting}>
+               {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "احذف الكل"}
             </Button>
           </DialogFooter>
         </DialogContent>
