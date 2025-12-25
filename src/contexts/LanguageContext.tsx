@@ -59,6 +59,10 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.leaderboard': 'المتصدرين',
     'nav.contact': 'تواصل معنا',
 
+    'header.brand': 'فريق سباقات قنا',
+    'header.subbrand': 'Qena Racing Team', // غالباً الاسم الإنجليزي يكتب كشعار فرعي
+    'lang.name': 'English', // الاسم الذي سيظهر للتحويل
+
     // Hero
     'hero.title': 'فريق سباقات قنا',
     'hero.subtitle': 'نحن فريق رياضي متميز نسعى للتميز والابتكار في عالم السباقات والهندسة الميكانيكية',
@@ -135,6 +139,44 @@ const translations: Record<Language, Record<string, string>> = {
     'contact.toast.error': 'الرجاء ملء جميع الحقول المطلوبة',
     'contact.toast.success': 'تم إرسال رسالتك بنجاح! سنتواصل معك قريباً',
 
+    // Admin Dashboard
+    'admin.title': 'لوحة التحكم',
+    'admin.subtitle': 'Qena Racing Team',
+    'admin.logout': 'تسجيل الخروج',
+    'admin.logout.success': 'تم تسجيل الخروج بنجاح',
+
+    'admin.stats.members': 'الأعضاء',
+    'admin.stats.projects': 'المشاريع',
+    'admin.stats.points': 'النقاط الكلية',
+
+    'admin.nav.members.title': 'إدارة الأعضاء',
+    'admin.nav.members.desc': 'إضافة، تعديل، أو حذف أعضاء الفريق وإدارة معلوماتهم',
+    'admin.nav.members.btn': 'إدارة الأعضاء',
+
+    'admin.nav.projects.title': 'إدارة المشاريع',
+    'admin.nav.projects.desc': 'إضافة مشاريع جديدة وتحديث تفاصيل المشاريع الحالية',
+    'admin.nav.projects.btn': 'إدارة المشاريع',
+
+    'admin.nav.points.title': 'نظام النقاط',
+    'admin.nav.points.desc': 'إضافة أو تعديل نقاط الأعضاء بناءً على أدائهم الأسبوعي',
+    'admin.nav.points.btn': 'إدارة النقاط',
+
+
+    // Login Page
+    'login.title': 'لوحة التحكم',
+    'login.subtitle': 'تسجيل الدخول للمسؤولين فقط',
+    'login.email': 'البريد الإلكتروني',
+    'login.password': 'كلمة المرور',
+    'login.btn': 'تسجيل الدخول',
+    'login.loading': 'جاري التحقق...',
+    'login.back': 'العودة للصفحة الرئيسية',
+    'login.success': 'تم تسجيل الدخول بنجاح',
+    'login.error.required': 'يرجى إدخال البيانات كاملة',
+    'login.error.invalid': 'البريد الإلكتروني أو كلمة المرور غير صحيحة',
+    'login.error.server': 'حدث خطأ أثناء الاتصال بالسيرفر',
+    'login.error.noData': 'فشل تسجيل الدخول: لم يتم استلام بيانات صالحة',
+    'login.error.network': 'تعذر الاتصال بالسيرفر، تأكد من اتصال الإنترنت',
+
   },
   en: {
     // Header
@@ -144,6 +186,10 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.projects': 'Projects',
     'nav.leaderboard': 'Leaderboard',
     'nav.contact': 'Contact',
+
+    'header.brand': 'Qena Racing Team',
+    'header.subbrand': 'SVU University Team',
+    'lang.name': 'العربية',
 
     // Hero
     'hero.title': 'Qena Racing Team',
@@ -220,5 +266,42 @@ const translations: Record<Language, Record<string, string>> = {
 
     'contact.toast.error': 'Please fill in all required fields',
     'contact.toast.success': 'Your message has been sent successfully! We will contact you shortly',
+
+    // Admin Dashboard
+    'admin.title': 'Dashboard',
+    'admin.subtitle': 'Qena Racing Team',
+    'admin.logout': 'Logout',
+    'admin.logout.success': 'Logged out successfully',
+
+    'admin.stats.members': 'Members',
+    'admin.stats.projects': 'Projects',
+    'admin.stats.points': 'Total Points',
+
+    'admin.nav.members.title': 'Manage Members',
+    'admin.nav.members.desc': 'Add, edit, or delete team members and manage their info',
+    'admin.nav.members.btn': 'Manage Members',
+
+    'admin.nav.projects.title': 'Manage Projects',
+    'admin.nav.projects.desc': 'Add new projects and update current project details',
+    'admin.nav.projects.btn': 'Manage Projects',
+
+    'admin.nav.points.title': 'Points System',
+    'admin.nav.points.desc': 'Add or edit member points based on weekly performance',
+    'admin.nav.points.btn': 'Manage Points',
+
+    // Login Page
+    'login.title': 'Admin Dashboard',
+    'login.subtitle': 'Admin Login Only',
+    'login.email': 'Email Address',
+    'login.password': 'Password',
+    'login.btn': 'Login',
+    'login.loading': 'Verifying...',
+    'login.back': 'Back to Home',
+    'login.success': 'Login Successful',
+    'login.error.required': 'Please fill in all fields',
+    'login.error.invalid': 'Invalid email or password',
+    'login.error.server': 'Server connection error',
+    'login.error.noData': 'Login failed: Invalid data received',
+    'login.error.network': 'Connection failed, check your internet',
   }
 };

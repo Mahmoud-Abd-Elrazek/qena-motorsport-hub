@@ -2,12 +2,14 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
 import { Menu, X, Shield, Languages } from "lucide-react";
 import { useState } from "react";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { useLanguage } from "@/contexts/LanguageContext"; // تأكد من المسار
 
 const Header = () => {
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { language, toggleLanguage, t } = useLanguage();
+  
+  // استدعاء الـ Context
+  const { t, toggleLanguage, language } = useLanguage();
 
   const navItems = [
     { path: "/", label: t('nav.home') },
@@ -22,14 +24,21 @@ const Header = () => {
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
+          
+          {/* Logo Section */}
           <Link to="/" className="flex items-center gap-3">
+            {/* الشعار الرمزي (يبقى كما هو أو يمكن تغييره) */}
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-secondary shadow-racing">
               <span className="text-xl font-bold text-white">QRT</span>
             </div>
+            {/* النصوص المترجمة */}
             <div className="hidden md:block">
-              <h1 className="text-lg font-bold text-foreground">فريق سباقات قنا</h1>
-              <p className="text-xs text-muted-foreground">Qena Racing Team</p>
+              <h1 className="text-lg font-bold text-foreground leading-none mb-1">
+                {t('header.brand')}
+              </h1>
+              <p className="text-xs text-muted-foreground font-medium">
+                {t('header.subbrand')}
+              </p>
             </div>
           </Link>
 
@@ -39,27 +48,31 @@ const Header = () => {
               <Link key={item.path} to={item.path}>
                 <Button
                   variant={location.pathname === item.path ? "default" : "ghost"}
-                  className="transition-smooth"
+                  className="transition-smooth font-medium"
                 >
                   {item.label}
                 </Button>
               </Link>
             ))}
+
+            {/* Language Toggle */}
             <Button
               variant="ghost"
               size="icon"
               onClick={toggleLanguage}
-              title={language === 'ar' ? 'English' : 'العربية'}
+              title={t('lang.name')}
               className="transition-smooth"
             >
               <Languages className="h-4 w-4" />
             </Button>
+
+            {/* Admin Link */}
             <Link to="/admin">
               <Button
                 variant={location.pathname === "/admin" ? "default" : "ghost"}
                 className="transition-smooth"
                 size="icon"
-                title="لوحة التحكم"
+                title={t('admin.title')}
               >
                 <Shield className="h-4 w-4" />
               </Button>
@@ -77,9 +90,9 @@ const Header = () => {
           </Button>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Mobile Navigation Menu */}
         {isMenuOpen && (
-          <nav className="md:hidden border-t border-border py-4 space-y-2">
+          <nav className="md:hidden border-t border-border py-4 space-y-2 animate-in slide-in-from-top-2 duration-200">
             {navItems.map((item) => (
               <Link key={item.path} to={item.path} onClick={() => setIsMenuOpen(false)}>
                 <Button
@@ -90,23 +103,32 @@ const Header = () => {
                 </Button>
               </Link>
             ))}
-            <Button
-              variant="ghost"
-              onClick={toggleLanguage}
-              className="w-full justify-start transition-smooth"
-            >
-              <Languages className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
-              {language === 'ar' ? 'English' : 'العربية'}
-            </Button>
-            <Link to="/admin" onClick={() => setIsMenuOpen(false)}>
+            
+            <div className="border-t border-border my-2 pt-2 space-y-2">
+              {/* Language Switcher Mobile */}
               <Button
-                variant={location.pathname === "/admin" ? "default" : "ghost"}
-                className="w-full justify-start transition-smooth"
+                variant="ghost"
+                onClick={() => {
+                  toggleLanguage();
+                  setIsMenuOpen(false);
+                }}
+                className="w-full justify-start transition-smooth gap-3"
               >
-                <Shield className="ml-2 h-4 w-4" />
-                لوحة التحكم
+                <Languages className="h-4 w-4" />
+                <span>{t('lang.name')}</span>
               </Button>
-            </Link>
+
+              {/* Admin Link Mobile */}
+              <Link to="/admin" onClick={() => setIsMenuOpen(false)}>
+                <Button
+                  variant={location.pathname === "/admin" ? "default" : "ghost"}
+                  className="w-full justify-start transition-smooth gap-3"
+                >
+                  <Shield className="h-4 w-4" />
+                  <span>{t('admin.title')}</span>
+                </Button>
+              </Link>
+            </div>
           </nav>
         )}
       </div>

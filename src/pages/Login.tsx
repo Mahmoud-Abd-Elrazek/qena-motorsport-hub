@@ -5,16 +5,26 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Shield } from "lucide-react";
+import { Shield, Globe } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const { t, toggleLanguage } = useLanguage();
+
+  // إدارة الحالة (State)
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!username || !password) {
+      toast.error(t('login.error.required'));
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -26,9 +36,9 @@ const LoginPage = () => {
 
       if (!response.ok) {
         if (response.status === 401) {
-          toast.error("البريد الإلكتروني أو كلمة المرور غير صحيحة");
+          toast.error(t('login.error.invalid'));
         } else {
-          toast.error("حدث خطأ أثناء الاتصال بالسيرفر");
+          toast.error(`${t('login.error.server')}: ${response.status}`);
         }
         setLoading(false);
         return;
@@ -39,20 +49,33 @@ const LoginPage = () => {
 
       if (token) {
         localStorage.setItem("token", token);
-        toast.success("تم تسجيل الدخول بنجاح");
-        navigate("/admin"); // التوجيه للوحة التحكم
+        toast.success(t('login.success'));
+        navigate("/admin");
       } else {
-        toast.error("لم يتم العثور على بيانات صالحة");
+        toast.error(t('login.error.noData'));
       }
+
     } catch (error) {
-      toast.error("تعذر الاتصال بالسيرفر");
+      console.error("Login Error:", error);
+      toast.error(t('login.error.network'));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen gradient-hero flex items-center justify-center p-4">
+    <div className="min-h-screen gradient-hero flex items-center justify-center p-4 relative">
+
+      {/* زر تبديل اللغة */}
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={toggleLanguage}
+        className="absolute top-4 right-4 md:top-8 md:right-8 bg-background/50 backdrop-blur-sm hover:bg-background/20"
+      >
+        <Globe className="h-5 w-5" />
+      </Button>
+
       <Card className="w-full max-w-md">
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-center">
@@ -61,40 +84,43 @@ const LoginPage = () => {
             </div>
           </div>
           <div>
-            <CardTitle className="text-2xl">لوحة التحكم</CardTitle>
-            <p className="text-sm text-muted-foreground mt-2">تسجيل الدخول للمسؤولين فقط</p>
+            <CardTitle className="text-2xl">{t('login.title')}</CardTitle>
+            <p className="text-sm text-muted-foreground mt-2">{t('login.subtitle')}</p>
           </div>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="username">البريد الإلكتروني</Label>
+              <Label htmlFor="username">{t('login.email')}</Label>
               <Input
                 id="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="admin@example.com"
-                dir="ltr"
+                dir="ltr" // الإيميل دائماً من اليسار لليمين
+                className="text-left"
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">كلمة المرور</Label>
+              <Label htmlFor="password">{t('login.password')}</Label>
               <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
+                dir="ltr"
+                className="text-left"
                 required
               />
             </div>
             <Button type="submit" className="w-full gradient-hero" disabled={loading}>
-              {loading ? "جاري التحقق..." : "تسجيل الدخول"}
+              {loading ? t('login.loading') : t('login.btn')}
             </Button>
             <div className="text-center">
               <Button type="button" variant="link" onClick={() => navigate("/")} className="text-sm">
-                العودة للصفحة الرئيسية
+                {t('login.back')}
               </Button>
             </div>
           </form>
