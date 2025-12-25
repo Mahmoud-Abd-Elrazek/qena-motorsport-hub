@@ -22,8 +22,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ArrowRight, Plus, Pencil, Trash2, Loader2, Linkedin, AlertTriangle } from "lucide-react";
+import { ArrowLeft, ArrowRight, Plus, Pencil, Trash2, Loader2, Linkedin, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext"; // استيراد الكونتكست
 
 interface Member {
   id: number;
@@ -37,9 +38,10 @@ interface Member {
   image?: File;
 }
 
-
 const ManageMembers = () => {
   const navigate = useNavigate();
+  const { t, language } = useLanguage();
+  const dir = language === 'ar' ? 'rtl' : 'ltr';
 
   const [members, setMembers] = useState<Member[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -48,16 +50,13 @@ const ManageMembers = () => {
     name: "", role: "", specialization: "", bio: "", points: 0, linkedInUrl: ""
   });
 
-
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const observer = useRef<IntersectionObserver | null>(null);
 
-
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [memberToDelete, setMemberToDelete] = useState<Member | null>(null); // لتخزين بيانات العضو المراد حذفه
-
+  const [memberToDelete, setMemberToDelete] = useState<Member | null>(null);
 
   const confirmDelete = async () => {
     if (!memberToDelete || isLoading) return;
@@ -73,16 +72,15 @@ const ManageMembers = () => {
       if (!response.ok) throw new Error();
 
       setMembers(prev => prev.filter(m => m.id !== memberToDelete.id));
-      toast.success(`تم حذف العضو ${memberToDelete.name} بنجاح`);
+      toast.success(t('toast.delete.success'));
     } catch {
-      toast.error("فشل في عملية الحذف");
+      toast.error(t('toast.delete.error'));
     } finally {
       setIsLoading(false);
       setIsDeleteDialogOpen(false);
       setMemberToDelete(null);
     }
   };
-
 
   const fetchMembers = useCallback(async (pageNumber: number) => {
     if (isLoading || (!hasMore && pageNumber !== 1)) return;
@@ -122,11 +120,11 @@ const ManageMembers = () => {
       setMembers(prev => (pageNumber === 1 ? mappedMembers : [...prev, ...mappedMembers]));
       setHasMore(mappedMembers.length === 10);
     } catch (error) {
-      toast.error("فشل في تحميل الأعضاء");
+      toast.error(t('list.error'));
     } finally {
       setIsLoading(false);
     }
-  }, [isLoading, hasMore, navigate]);
+  }, [isLoading, hasMore, navigate, t]);
 
   const lastMemberRef = useCallback((node: HTMLDivElement) => {
     if (isLoading) return;
@@ -145,29 +143,13 @@ const ManageMembers = () => {
     fetchMembers(page);
   }, [page]);
 
-  const handleDelete = async (id: number) => {
-    if (!confirm("هل أنت متأكد من حذف هذا العضو؟")) return;
-    try {
-      const token = localStorage.getItem("token");
-      await fetch(`https://qenaracingteam.runasp.net/Racing/Member/DeleteMember/${id}`, {
-        method: "DELETE",
-        headers: { "Authorization": `Bearer ${token}` },
-      });
-      setMembers(prev => prev.filter(m => m.id !== id));
-      toast.success("تم الحذف بنجاح");
-    } catch {
-      toast.error("فشل الحذف");
-    }
-  };
-
   const handleSave = async () => {
     if (isLoading) return;
 
     if (!formData.name || !formData.role || formData.points === undefined || !formData.specialization || !formData.bio) {
-      toast.error("يرجى ملء الحقول المطلوبة");
+      toast.error(t('form.required'));
       return;
     }
-
 
     const token = localStorage.getItem("token");
     const data = new FormData();
@@ -204,43 +186,49 @@ const ManageMembers = () => {
       }
 
       setIsDialogOpen(false);
-      toast.success("تم حفظ البيانات بنجاح");
+      toast.success(t('toast.save.success'));
     } catch (error) {
-      toast.error("حدث خطأ أثناء الحفظ، يرجى المحاولة مرة أخرى");
+      toast.error(t('toast.save.error'));
     } finally {
       setIsLoading(false);
     }
   };
 
-
   return (
-    <div className="min-h-screen bg-muted/30 pb-10 font-sans" dir="rtl">
+    // استخدام dir من الكونتكست لضبط اتجاه الصفحة بالكامل
+    <div className="min-h-screen bg-muted/30 pb-10 font-sans" dir={dir}>
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Button variant="ghost" onClick={() => navigate("/admin")} className="gap-2">
-            <ArrowRight className="h-4 w-4" /> العودة للوحة التحكم
+            {/* تغيير أيقونة السهم بناءً على الاتجاه */}
+            {language === 'ar' ? <ArrowRight className="h-4 w-4" /> : <ArrowLeft className="h-4 w-4" />}
+            {t('manage.members.back')}
           </Button>
-          <h1 className="text-xl font-bold">إدارة شؤون الأعضاء</h1>
+          <h1 className="text-xl font-bold">{t('manage.members.title')}</h1>
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-8">
         <Card className="shadow-lg border-none">
           <CardHeader className="flex flex-row items-center justify-between border-b mb-4">
-            <CardTitle className="text-2xl">قائمة الفريق ({members.length})</CardTitle>
+            <CardTitle className="text-2xl">
+              {t('manage.members.list')} <span className="text-muted-foreground text-lg">({members.length})</span>
+            </CardTitle>
             <Button onClick={() => { setEditingMember(null); setFormData({}); setIsDialogOpen(true); }}>
-              <Plus className="ml-2 h-5 w-5" /> إضافة عضو جديد
+              <Plus className="ms-2 h-5 w-5" /> {/* استخدمنا ms-2 بدلاً من ml-2 */}
+              {t('manage.members.add')}
             </Button>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader className="bg-muted/50">
                 <TableRow>
-                  <TableHead className="text-right">العضو</TableHead>
-                  <TableHead className="text-right">الدور</TableHead>
-                  <TableHead className="text-center">النقاط</TableHead>
-                  <TableHead className="text-right font-bold">الإجراءات</TableHead>
+                  {/* استخدام text-start لضبط المحاذاة تلقائياً */}
+                  <TableHead className="text-start">{t('table.member')}</TableHead>
+                  <TableHead className="text-start">{t('table.role')}</TableHead>
+                  <TableHead className="text-center">{t('table.points')}</TableHead>
+                  <TableHead className="text-start font-bold">{t('table.actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -262,7 +250,7 @@ const ManageMembers = () => {
                     </TableCell>
                     <TableCell>
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        {member.role || "عضو"}
+                        {member.role || t('table.role.default')}
                       </span>
                     </TableCell>
                     <TableCell className="text-center">
@@ -270,12 +258,19 @@ const ManageMembers = () => {
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2">
-                        <Button variant="outline" size="icon" className="h-8 w-8 text-blue-600" onClick={() => { setEditingMember(member); setFormData(member); setIsDialogOpen(true); }}>
+                        <Button 
+                          variant="outline" 
+                          size="icon" 
+                          className="h-8 w-8 text-blue-600" 
+                          title={t('btn.edit')}
+                          onClick={() => { setEditingMember(member); setFormData(member); setIsDialogOpen(true); }}
+                        >
                           <Pencil className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="outline"
                           size="icon"
+                          title={t('btn.delete')}
                           className="h-8 w-8 text-destructive hover:bg-destructive/100"
                           onClick={() => {
                             setMemberToDelete(member);
@@ -295,10 +290,10 @@ const ManageMembers = () => {
             <div ref={lastMemberRef} className="py-8 flex justify-center">
               {isLoading ? (
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <Loader2 className="h-5 w-5 animate-spin" /> جاري تحميل المزيد...
+                  <Loader2 className="h-5 w-5 animate-spin" /> {t('list.loading')}
                 </div>
               ) : !hasMore && (
-                <p className="text-sm text-muted-foreground">وصلت إلى نهاية القائمة</p>
+                <p className="text-sm text-muted-foreground">{t('list.end')}</p>
               )}
             </div>
           </CardContent>
@@ -309,8 +304,8 @@ const ManageMembers = () => {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="max-w-xl">
           <DialogHeader>
-            <DialogTitle>{editingMember ? "تعديل بيانات العضو" : "إضافة عضو جديد للفريق"}</DialogTitle>
-            <DialogDescription>يرجى التأكد من صحة البيانات، خاصة رابط LinkedIn.</DialogDescription>
+            <DialogTitle>{editingMember ? t('dialog.edit.title') : t('dialog.add.title')}</DialogTitle>
+            <DialogDescription>{t('dialog.desc')}</DialogDescription>
           </DialogHeader>
 
           <div className="grid gap-6 py-4">
@@ -320,11 +315,11 @@ const ManageMembers = () => {
                 <AvatarFallback>IMG</AvatarFallback>
               </Avatar>
               <div className="grid gap-1.5 flex-1">
-                <Label>الصورة الشخصية</Label>
+                <Label>{t('form.image')}</Label>
                 <Input type="file" accept="image/*" className="cursor-pointer" onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (file && file.size > 2 * 1024 * 1024) {
-                    toast.error("حجم الصورة كبير جداً! الحد الأقصى 2 ميجابايت");
+                    toast.error(t('form.image.error'));
                     return;
                   }
                   setFormData({ ...formData, image: file });
@@ -334,34 +329,42 @@ const ManageMembers = () => {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label>الاسم الكامل</Label>
-                <Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="مثال: أحمد محمد" />
+                <Label>{t('form.name')}</Label>
+                <Input 
+                  value={formData.name} 
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })} 
+                  placeholder={t('form.name.placeholder')} 
+                />
               </div>
               <div className="grid gap-2">
-                <Label>الدور في الفريق</Label>
-                <Input value={formData.role} onChange={(e) => setFormData({ ...formData, role: e.target.value })} placeholder="مثال: Team Leader" />
+                <Label>{t('form.role')}</Label>
+                <Input 
+                  value={formData.role} 
+                  onChange={(e) => setFormData({ ...formData, role: e.target.value })} 
+                  placeholder={t('form.role.placeholder')} 
+                />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label>التخصص</Label>
+                <Label>{t('form.specialization')}</Label>
                 <Input value={formData.specialization} onChange={(e) => setFormData({ ...formData, specialization: e.target.value })} />
               </div>
               <div className="grid gap-2">
-                <Label>النقاط</Label>
+                <Label>{t('table.points')}</Label>
                 <Input type="number" value={formData.points} onChange={(e) => setFormData({ ...formData, points: parseInt(e.target.value) || 0 })} />
               </div>
             </div>
 
             <div className="grid gap-2">
-              <Label>نبذة تعريفية</Label>
+              <Label>{t('form.bio')}</Label>
               <Textarea rows={3} value={formData.bio} onChange={(e) => setFormData({ ...formData, bio: e.target.value })} />
             </div>
 
             <div className="grid gap-2">
               <Label className="flex items-center gap-2 text-blue-700">
-                <Linkedin className="h-4 w-4" /> رابط LinkedIn
+                <Linkedin className="h-4 w-4" /> {t('form.linkedin')}
               </Label>
               <Input dir="ltr" placeholder="https://linkedin.com/in/username" value={formData.linkedInUrl} onChange={(e) => setFormData({ ...formData, linkedInUrl: e.target.value })} />
             </div>
@@ -374,7 +377,7 @@ const ManageMembers = () => {
               onClick={() => setIsDialogOpen(false)}
               disabled={isLoading}
             >
-              إلغاء
+              {t('btn.cancel')}
             </Button>
 
             <Button
@@ -384,32 +387,31 @@ const ManageMembers = () => {
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="ml-2 h-4 w-4 animate-spin" />
-                  جاري الحفظ...
+                  <Loader2 className="ms-2 h-4 w-4 animate-spin" />
+                  {t('btn.saving')}
                 </>
               ) : (
-                "حفظ البيانات"
+                t('btn.save')
               )}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* نافذة تأكيد الحذف الاحترافية */}
+      {/* Delete Confirmation Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={(v) => !isLoading && setIsDeleteDialogOpen(v)}>
         <DialogContent className="max-w-[400px] border-none shadow-2xl p-6">
           <div className="flex flex-col items-center text-center">
-            {/* أيقونة تحذير */}
             <div className="h-14 w-14 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
               <AlertTriangle className="h-7 w-7 text-destructive" />
             </div>
 
             <DialogHeader>
-              <DialogTitle className="text-xl text-center font-bold">تأكيد الحذف</DialogTitle>
+              <DialogTitle className="text-xl text-center font-bold">{t('delete.title')}</DialogTitle>
               <DialogDescription className="text-center pt-2 text-base">
-                هل أنت متأكد من حذف <span className="font-bold text-foreground">"{memberToDelete?.name}"</span>؟
+                {t('delete.desc')} <span className="font-bold text-foreground">"{memberToDelete?.name}"</span>؟
                 <br />
-                <span className="text-sm text-destructive mt-2 block">هذا الإجراء لا يمكن الرجوع عنه.</span>
+                <span className="text-sm text-destructive mt-2 block">{t('delete.warning')}</span>
               </DialogDescription>
             </DialogHeader>
           </div>
@@ -421,7 +423,7 @@ const ManageMembers = () => {
               onClick={() => setIsDeleteDialogOpen(false)}
               disabled={isLoading}
             >
-              إلغاء
+              {t('btn.cancel')}
             </Button>
             <Button
               variant="destructive"
@@ -429,7 +431,7 @@ const ManageMembers = () => {
               onClick={confirmDelete}
               disabled={isLoading}
             >
-              {isLoading ? <Loader2 className="h-4 w-4 animate-spin ml-2" /> : "نعم، احذف الآن"}
+              {isLoading ? <Loader2 className="h-4 w-4 animate-spin ms-2" /> : t('btn.confirm_delete')}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -177,6 +177,61 @@ const translations: Record<Language, Record<string, string>> = {
     'login.error.noData': 'فشل تسجيل الدخول: لم يتم استلام بيانات صالحة',
     'login.error.network': 'تعذر الاتصال بالسيرفر، تأكد من اتصال الإنترنت',
 
+
+    // Manage Members Page
+    'manage.members.title': 'إدارة شؤون الأعضاء',
+    'manage.members.back': 'العودة للوحة التحكم',
+    'manage.members.list': 'قائمة الفريق',
+    'manage.members.add': 'إضافة عضو جديد',
+
+    // Table Headers
+    'table.member': 'العضو',
+    'table.role': 'الدور',
+    'table.points': 'النقاط',
+    'table.actions': 'الإجراءات',
+    'table.role.default': 'عضو',
+
+    // Pagination / Loading
+    'list.loading': 'جاري تحميل المزيد...',
+    'list.end': 'وصلت إلى نهاية القائمة',
+    'list.error': 'فشل في تحميل الأعضاء',
+
+    // Dialogs (Add/Edit)
+    'dialog.edit.title': 'تعديل بيانات العضو',
+    'dialog.add.title': 'إضافة عضو جديد للفريق',
+    'dialog.desc': 'يرجى التأكد من صحة البيانات، خاصة رابط LinkedIn.',
+
+    // Form Fields
+    'form.image': 'الصورة الشخصية',
+    'form.image.error': 'حجم الصورة كبير جداً! الحد الأقصى 2 ميجابايت',
+    'form.name': 'الاسم الكامل',
+    'form.name.placeholder': 'مثال: أحمد محمد',
+    'form.role': 'الدور في الفريق',
+    'form.role.placeholder': 'مثال: Team Leader',
+    'form.specialization': 'التخصص',
+    'form.bio': 'نبذة تعريفية',
+    'form.linkedin': 'رابط LinkedIn',
+    'form.required': 'يرجى ملء الحقول المطلوبة',
+
+    // Actions
+    'btn.cancel': 'إلغاء',
+    'btn.save': 'حفظ البيانات',
+    'btn.saving': 'جاري الحفظ...',
+    'btn.delete': 'حذف',
+    'btn.edit': 'تعديل',
+    'btn.confirm_delete': 'نعم، احذف الآن',
+
+    // Delete Dialog
+    'delete.title': 'تأكيد الحذف',
+    'delete.desc': 'هل أنت متأكد من حذف',
+    'delete.warning': 'هذا الإجراء لا يمكن الرجوع عنه.',
+
+    // Toasts
+    'toast.delete.success': 'تم حذف العضو بنجاح',
+    'toast.delete.error': 'فشل في عملية الحذف',
+    'toast.save.success': 'تم حفظ البيانات بنجاح',
+    'toast.save.error': 'حدث خطأ أثناء الحفظ',
+
   },
   en: {
     // Header
@@ -303,5 +358,59 @@ const translations: Record<Language, Record<string, string>> = {
     'login.error.server': 'Server connection error',
     'login.error.noData': 'Login failed: Invalid data received',
     'login.error.network': 'Connection failed, check your internet',
+
+    // Manage Members Page
+    'manage.members.title': 'Manage Members',
+    'manage.members.back': 'Back to Dashboard',
+    'manage.members.list': 'Team List',
+    'manage.members.add': 'Add New Member',
+
+    // Table Headers
+    'table.member': 'Member',
+    'table.role': 'Role',
+    'table.points': 'Points',
+    'table.actions': 'Actions',
+    'table.role.default': 'Member',
+
+    // Pagination / Loading
+    'list.loading': 'Loading more...',
+    'list.end': 'End of list reached',
+    'list.error': 'Failed to load members',
+
+    // Dialogs (Add/Edit)
+    'dialog.edit.title': 'Edit Member Details',
+    'dialog.add.title': 'Add New Team Member',
+    'dialog.desc': 'Please verify the data, especially the LinkedIn URL.',
+
+    // Form Fields
+    'form.image': 'Profile Image',
+    'form.image.error': 'Image size is too large! Max 2MB',
+    'form.name': 'Full Name',
+    'form.name.placeholder': 'Ex: John Doe',
+    'form.role': 'Team Role',
+    'form.role.placeholder': 'Ex: Team Leader',
+    'form.specialization': 'Specialization',
+    'form.bio': 'Bio',
+    'form.linkedin': 'LinkedIn URL',
+    'form.required': 'Please fill in required fields',
+
+    // Actions
+    'btn.cancel': 'Cancel',
+    'btn.save': 'Save Data',
+    'btn.saving': 'Saving...',
+    'btn.delete': 'Delete',
+    'btn.edit': 'Edit',
+    'btn.confirm_delete': 'Yes, Delete Now',
+
+    // Delete Dialog
+    'delete.title': 'Confirm Delete',
+    'delete.desc': 'Are you sure you want to delete',
+    'delete.warning': 'This action cannot be undone.',
+
+    // Toasts
+    'toast.delete.success': 'Member deleted successfully',
+    'toast.delete.error': 'Delete operation failed',
+    'toast.save.success': 'Data saved successfully',
+    'toast.save.error': 'Error occurred while saving',
   }
 };
