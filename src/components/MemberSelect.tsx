@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Check, ChevronsUpDown, Linkedin, Loader2, Search, UserPlus } from "lucide-react";
+import { Check, ChevronsUpDown, Linkedin, Loader2, UserPlus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -21,8 +21,12 @@ import { Input } from "./ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Textarea } from "./ui/textarea";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext"; // استيراد الكونتكست
 
 export default function ProfessionalMemberSelect({ members, formData, setFormData, fetchMembers }) {
+  const { t, language } = useLanguage(); // استخدام اللغة والاتجاه
+    const dir = language === 'ar' ? 'rtl' : 'ltr';
+
   const [open, setOpen] = React.useState(false);
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -43,7 +47,7 @@ export default function ProfessionalMemberSelect({ members, formData, setFormDat
 
     // التحقق من الحقول المطلوبة
     if (!formAddData.name || !formAddData.role || !formAddData.specialization || !formAddData.bio) {
-      toast.error("يرجى ملء كافة الحقول المطلوبة الأساسية");
+      toast.error(t('form.required')); // استخدام الترجمة
       return;
     }
 
@@ -69,7 +73,7 @@ export default function ProfessionalMemberSelect({ members, formData, setFormDat
 
       if (!response.ok) throw new Error("Failed to add member");
 
-      toast.success("تم إضافة العضو الجديد بنجاح");
+      toast.success(t('toast.save.success')); // استخدام الترجمة
 
       if (fetchMembers) fetchMembers();
 
@@ -79,7 +83,7 @@ export default function ProfessionalMemberSelect({ members, formData, setFormDat
       setIsDialogOpen(false);
 
     } catch (error) {
-      toast.error("حدث خطأ أثناء الإضافة، يرجى المحاولة مرة أخرى");
+      toast.error(t('toast.save.error')); // استخدام الترجمة
     } finally {
       setIsLoading(false);
     }
@@ -88,8 +92,9 @@ export default function ProfessionalMemberSelect({ members, formData, setFormDat
   const selectedMember = members.find((m) => m.memberId === formData.memberId);
 
   return (
-    <div className="grid gap-2 text-right" dir="rtl">
-      <Label className="text-sm font-bold text-slate-700">اختر العضو المسجل *</Label>
+    // استخدام dir و text-start لدعم الاتجاهين
+    <div className="grid gap-2 text-start" dir={dir}>
+      <Label className="text-sm font-bold text-slate-700">{t('select.label')}</Label>
 
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
@@ -109,28 +114,30 @@ export default function ProfessionalMemberSelect({ members, formData, setFormDat
                   <span className="font-medium">{selectedMember.memberName}</span>
                 </>
               ) : (
-                <span className="text-muted-foreground">ابحث عن اسم العضو...</span>
+                <span className="text-muted-foreground">{t('select.placeholder')}</span>
               )}
             </div>
             <ChevronsUpDown className="h-4 w-4 opacity-50" />
           </Button>
         </PopoverTrigger>
 
-        <PopoverContent className="w-[100%] p-0 shadow-xl" align="start">
+        <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 shadow-xl" align="start">
           <Command>
-            <CommandInput placeholder="اكتب اسم العضو للبحث..." className="h-11" />
+            {/* استخدام text-start لضبط محاذاة النص في البحث */}
+            <CommandInput placeholder={t('select.search_placeholder')} className="h-11 text-start" />
             <CommandList className="max-h-[300px] overflow-y-auto custom-scrollbar" onWheel={(e) => e.stopPropagation()}>
               <CommandEmpty className="py-6 text-center">
-                <p className="text-sm text-muted-foreground mb-3">العضو غير موجود.</p>
+                <p className="text-sm text-muted-foreground mb-3">{t('select.not_found')}</p>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => { setOpen(false); setIsDialogOpen(true); }}
                 >
-                  <UserPlus className="ml-2 h-4 w-4" /> إضافة عضو جديد
+                  {/* استخدام ms-2 (Margin Start) ليعمل في الجهتين */}
+                  <UserPlus className="ms-2 h-4 w-4" /> {t('select.add_new')}
                 </Button>
               </CommandEmpty>
-              <CommandGroup heading="الأعضاء المسجلين">
+              <CommandGroup heading={t('select.registered_group')}>
                 {members.map((m) => (
                   <CommandItem
                     key={m.memberId}
@@ -147,8 +154,9 @@ export default function ProfessionalMemberSelect({ members, formData, setFormDat
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col flex-1">
-                      <span className="font-medium text-right">{m.memberName}</span>
-                      <span className="text-[11px] text-right">{m.role}</span>
+                      {/* استخدام text-start بدلاً من text-right */}
+                      <span className="font-medium text-start">{m.memberName}</span>
+                      <span className="text-[11px] text-start">{m.role || t('points.no_role')}</span>
                     </div>
                     <Check className={cn("h-4 w-4 text-primary", formData.memberId === m.memberId ? "opacity-100" : "opacity-0")} />
                   </CommandItem>
@@ -161,10 +169,11 @@ export default function ProfessionalMemberSelect({ members, formData, setFormDat
 
       {/* نافذة الإضافة المحدثة */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-xl" dir="rtl">
-          <DialogHeader className="text-right">
-            <DialogTitle className="text-2xl font-bold">إضافة عضو جديد</DialogTitle>
-            <DialogDescription>أدخل بيانات العضو الجديد لإضافته للفريق.</DialogDescription>
+        {/* ضبط الاتجاه للنافذة المنبثقة */}
+        <DialogContent className="max-w-xl" dir={dir}>
+          <DialogHeader className="text-start">
+            <DialogTitle className="text-2xl font-bold">{t('dialog.add.title')}</DialogTitle>
+            <DialogDescription>{t('dialog.desc')}</DialogDescription>
           </DialogHeader>
 
           <div className="grid gap-5 py-4">
@@ -174,51 +183,52 @@ export default function ProfessionalMemberSelect({ members, formData, setFormDat
                 <AvatarImage src={formAddData.image ? URL.createObjectURL(formAddData.image) : ""} className="object-cover" />
                 <AvatarFallback><UserPlus className="h-8 w-8 text-slate-400" /></AvatarFallback>
               </Avatar>
-              <div className="grid gap-1.5 flex-1 text-right">
-                <Label>الصورة الشخصية</Label>
+              <div className="grid gap-1.5 flex-1 text-start">
+                <Label>{t('form.image')}</Label>
                 <Input type="file" accept="image/*" onChange={(e) => setFormAddData({ ...formAddData, image: e.target.files?.[0] })} />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2 text-right">
-                <Label>الاسم الكامل *</Label>
-                <Input value={formAddData.name} onChange={(e) => setFormAddData({ ...formAddData, name: e.target.value })} placeholder="أحمد علي" />
+              <div className="grid gap-2 text-start">
+                <Label>{t('form.name')} *</Label>
+                <Input value={formAddData.name} onChange={(e) => setFormAddData({ ...formAddData, name: e.target.value })} placeholder={t('form.name.placeholder')} />
               </div>
-              <div className="grid gap-2 text-right">
-                <Label>الدور *</Label>
-                <Input value={formAddData.role} onChange={(e) => setFormAddData({ ...formAddData, role: e.target.value })} placeholder="Team Leader" />
+              <div className="grid gap-2 text-start">
+                <Label>{t('form.role')} *</Label>
+                <Input value={formAddData.role} onChange={(e) => setFormAddData({ ...formAddData, role: e.target.value })} placeholder={t('form.role.placeholder')} />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2 text-right">
-                <Label>التخصص *</Label>
+              <div className="grid gap-2 text-start">
+                <Label>{t('form.specialization')} *</Label>
                 <Input value={formAddData.specialization} onChange={(e) => setFormAddData({ ...formAddData, specialization: e.target.value })} />
               </div>
-              <div className="grid gap-2 text-right">
-                <Label>النقاط</Label>
+              <div className="grid gap-2 text-start">
+                <Label>{t('table.points')}</Label>
                 <Input type="number" value={formAddData.points} onChange={(e) => setFormAddData({ ...formAddData, points: parseInt(e.target.value) || 0 })} />
               </div>
             </div>
 
-            <div className="grid gap-2 text-right">
-              <Label>نبذة تعريفية *</Label>
+            <div className="grid gap-2 text-start">
+              <Label>{t('form.bio')} *</Label>
               <Textarea rows={3} value={formAddData.bio} onChange={(e) => setFormAddData({ ...formAddData, bio: e.target.value })} />
             </div>
 
-            <div className="grid gap-2 text-right">
+            <div className="grid gap-2 text-start">
               <Label className="flex items-center gap-2 text-blue-700">
-                <Linkedin className="h-4 w-4" /> LinkedIn
+                <Linkedin className="h-4 w-4" /> {t('form.linkedin')}
               </Label>
+              {/* LinkedIn URL دائماً LTR */}
               <Input dir="ltr" value={formAddData.linkedInUrl} onChange={(e) => setFormAddData({ ...formAddData, linkedInUrl: e.target.value })} />
             </div>
           </div>
 
           <DialogFooter className="gap-2">
-            <Button variant="ghost" className="flex-1" onClick={() => setIsDialogOpen(false)}>إلغاء</Button>
+            <Button variant="ghost" className="flex-1" onClick={() => setIsDialogOpen(false)}>{t('btn.cancel')}</Button>
             <Button onClick={handleSave} disabled={isLoading} className="flex-[2]">
-              {isLoading ? <><Loader2 className="ml-2 h-4 w-4 animate-spin" /> جاري الحفظ...</> : "إضافة العضو"}
+              {isLoading ? <><Loader2 className="ms-2 h-4 w-4 animate-spin" /> {t('btn.saving')}</> : t('select.add_new')}
             </Button>
           </DialogFooter>
         </DialogContent>

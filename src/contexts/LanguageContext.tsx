@@ -232,6 +232,56 @@ const translations: Record<Language, Record<string, string>> = {
     'toast.save.success': 'تم حفظ البيانات بنجاح',
     'toast.save.error': 'حدث خطأ أثناء الحفظ',
 
+    // Points System
+    'points.title': 'نظام النقاط',
+    'points.top_members': 'أفضل الأعضاء',
+    'points.no_role': 'بدون دور',
+    'points.unit': 'نقطة',
+
+    // History Section
+    'points.history.title': 'سجل النقاط',
+    'points.history.add': 'إضافة نقاط',
+    'points.history.clear_all': 'مسح السجل بالكامل',
+    'points.history.date': 'التاريخ',
+    'points.history.reason': 'السبب',
+    'points.history.no_data': 'لا توجد عمليات',
+
+    // Full List Section
+    'points.list.title': 'قائمة النقاط الكاملة',
+    'points.list.rank': 'الترتيب',
+
+    // Dialogs (Add Points)
+    'points.dialog.add_title': 'إضافة نقاط للعضو',
+    'points.dialog.points_label': 'النقاط',
+    'points.dialog.reason_label': 'السبب',
+    'points.dialog.btn_save': 'حفظ النقاط',
+
+    // Dialogs (Delete)
+    'points.dialog.delete_single_title': 'تأكيد حذف العملية',
+    'points.dialog.delete_single_desc': 'هل أنت متأكد من حذف هذه العملية من السجل؟',
+    'points.dialog.delete_single_note': 'سيتم تعديل نقاط العضو تلقائياً بعد الحذف.',
+    'points.dialog.delete_all_title': 'مسح السجل بالكامل',
+    'points.dialog.delete_all_desc': 'هذا الإجراء سيقوم بحذف جميع العمليات نهائياً.',
+    'points.dialog.btn_delete': 'نعم، احذف',
+    'points.dialog.btn_delete_all': 'احذف الكل',
+
+    // Toasts
+    'points.toast.fetch_error': 'حدث خطأ في تحديث بيانات الأعضاء',
+    'points.toast.delete_success': 'تم حذف العملية بنجاح',
+    'points.toast.delete_fail': 'فشل الحذف',
+    'points.toast.clear_success': 'تم مسح السجل بالكامل',
+    'points.toast.update_success': 'تم التحديث بنجاح!',
+    'points.loading': 'جاري تحميل البيانات...',
+
+    // Member Select Component
+    'select.label': 'اختر العضو المسجل *',
+    'select.placeholder': 'ابحث عن عضو...',
+    'select.search_placeholder': 'اكتب اسم العضو للبحث...',
+    'select.not_found': 'العضو غير موجود.',
+    'select.add_new': 'إضافة عضو جديد',
+    'select.registered_group': 'الأعضاء المسجلين',
+    'select.empty_state': 'لم يتم العثور على نتائج',
+
   },
   en: {
     // Header
@@ -412,5 +462,55 @@ const translations: Record<Language, Record<string, string>> = {
     'toast.delete.error': 'Delete operation failed',
     'toast.save.success': 'Data saved successfully',
     'toast.save.error': 'Error occurred while saving',
+
+    // Points System
+    'points.title': 'Points System',
+    'points.top_members': 'Top Members',
+    'points.no_role': 'No Role',
+    'points.unit': 'pts',
+
+    // History Section
+    'points.history.title': 'Points History',
+    'points.history.add': 'Add Points',
+    'points.history.clear_all': 'Clear All History',
+    'points.history.date': 'Date',
+    'points.history.reason': 'Reason',
+    'points.history.no_data': 'No transactions found',
+
+    // Full List Section
+    'points.list.title': 'Full Points List',
+    'points.list.rank': 'Rank',
+
+    // Dialogs (Add Points)
+    'points.dialog.add_title': 'Add Points to Member',
+    'points.dialog.points_label': 'Points',
+    'points.dialog.reason_label': 'Reason',
+    'points.dialog.btn_save': 'Save Points',
+
+    // Dialogs (Delete)
+    'points.dialog.delete_single_title': 'Confirm Transaction Delete',
+    'points.dialog.delete_single_desc': 'Are you sure you want to delete this transaction?',
+    'points.dialog.delete_single_note': 'Member points will be adjusted automatically.',
+    'points.dialog.delete_all_title': 'Clear Entire History',
+    'points.dialog.delete_all_desc': 'This action will permanently delete all transactions.',
+    'points.dialog.btn_delete': 'Yes, Delete',
+    'points.dialog.btn_delete_all': 'Delete All',
+
+    // Toasts
+    'points.toast.fetch_error': 'Error updating member data',
+    'points.toast.delete_success': 'Transaction deleted successfully',
+    'points.toast.delete_fail': 'Delete failed',
+    'points.toast.clear_success': 'History cleared successfully',
+    'points.toast.update_success': 'Updated successfully!',
+    'points.loading': 'Loading data...',
+
+    // Member Select Component
+    'select.label': 'Select Registered Member *',
+    'select.placeholder': 'Search for member...',
+    'select.search_placeholder': 'Type member name to search...',
+    'select.not_found': 'Member not found.',
+    'select.add_new': 'Add New Member',
+    'select.registered_group': 'Registered Members',
+    'select.empty_state': 'No results found',
   }
 };

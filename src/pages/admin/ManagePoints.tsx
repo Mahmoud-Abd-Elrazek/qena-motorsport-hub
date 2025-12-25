@@ -22,8 +22,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ArrowRight, Plus, Trophy, Loader2, TrendingDown, TrendingUp, Trash2, AlertTriangle } from "lucide-react";
+import { ArrowLeft, ArrowRight, Plus, Trophy, Loader2, TrendingDown, TrendingUp, Trash2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext"; // استيراد الكونتكست
 
 // Interfaces
 interface Member {
@@ -44,6 +45,8 @@ interface PointHistory {
 
 const ManagePoints = () => {
   const navigate = useNavigate();
+  const { t, language } = useLanguage(); // استخدام اللغة
+  const dir = language === 'ar' ? 'rtl' : 'ltr';
 
   // States
   const [members, setMembers] = useState<Member[]>([]);
@@ -59,9 +62,9 @@ const ManagePoints = () => {
   const [isHistoryLoading, setIsHistoryLoading] = useState(false);
   
   // States للـ Delete
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false); // مسح السجل بالكامل
-  const [isSingleDeleteDialogOpen, setIsSingleDeleteDialogOpen] = useState(false); // حذف عملية واحدة
-  const [idToDelete, setIdToDelete] = useState<number | null>(null); // الـ ID المطلوب حذفه حالياً
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isSingleDeleteDialogOpen, setIsSingleDeleteDialogOpen] = useState(false);
+  const [idToDelete, setIdToDelete] = useState<number | null>(null);
 
   const fetchMembers = async () => {
     try {
@@ -69,7 +72,7 @@ const ManagePoints = () => {
       const result = await response.json();
       if (result.isSuccess) setMembers(result.data);
     } catch (error) {
-      toast.error("حدث خطأ في تحديث بيانات الأعضاء");
+      toast.error(t('points.toast.fetch_error'));
     }
   };
 
@@ -116,15 +119,14 @@ const ManagePoints = () => {
       const result = await response.json();
 
       if (result.isSuccess) {
-        toast.success("تم حذف العملية بنجاح");
-        // تحديث الواجهة فوراً
+        toast.success(t('points.toast.delete_success'));
         setHistory(history.filter(t => t.pointHistoryId !== idToDelete));
-        fetchMembers(); // لتحديث النقاط في الكروت
+        fetchMembers();
       } else {
-        toast.error("فشل الحذف: " + result.message);
+        toast.error(`${t('points.toast.delete_fail')}: ${result.message}`);
       }
     } catch (error) {
-      toast.error("خطأ في الاتصال بالسيرفر");
+      toast.error(t('login.error.network')); // إعادة استخدام رسالة خطأ الشبكة
     } finally {
       setIsSubmitting(false);
       setIsSingleDeleteDialogOpen(false);
@@ -143,10 +145,10 @@ const ManagePoints = () => {
       if (response.ok) {
         setHistory([]);
         fetchMembers();
-        toast.success("تم مسح السجل بالكامل");
+        toast.success(t('points.toast.clear_success'));
       }
     } catch (error) {
-      toast.error("حدث خطأ أثناء مسح السجل");
+      toast.error(t('points.toast.delete_fail'));
     } finally {
       setIsSubmitting(false);
       setIsDeleteDialogOpen(false);
@@ -155,7 +157,7 @@ const ManagePoints = () => {
 
   const handleSave = async () => {
     if (!formData.memberId || formData.points === 0 || !formData.reason) {
-      toast.error("يرجى ملء جميع الحقول");
+      toast.error(t('form.required'));
       return;
     }
     try {
@@ -171,13 +173,13 @@ const ManagePoints = () => {
       });
       const result = await response.json();
       if (result.isSuccess) {
-        toast.success("تم التحديث بنجاح!");
+        toast.success(t('points.toast.update_success'));
         await Promise.all([fetchMembers(), fetchHistory()]);
         setIsDialogOpen(false);
         setFormData({ memberId: "", points: 0, reason: "" });
       }
     } catch (error) {
-      toast.error("حدث خطأ في الاتصال بالسيرفر");
+      toast.error(t('login.error.network'));
     } finally {
       setIsSubmitting(false);
     }
@@ -187,20 +189,21 @@ const ManagePoints = () => {
     return (
       <div className="h-screen w-full flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="mr-2 font-bold">جاري تحميل البيانات...</span>
+        <span className="ms-2 font-bold">{t('points.loading')}</span>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="min-h-screen bg-muted/30" dir={dir}>
       <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur">
         <div className="container mx-auto px-4">
           <div className="flex h-16 items-center justify-between">
             <Button variant="ghost" onClick={() => navigate("/admin")} className="gap-2">
-              <ArrowRight className="h-4 w-4" /> العودة للوحة التحكم
+              {language === 'ar' ? <ArrowRight className="h-4 w-4" /> : <ArrowLeft className="h-4 w-4" />}
+              {t('manage.members.back')}
             </Button>
-            <h1 className="text-lg font-bold">نظام النقاط</h1>
+            <h1 className="text-lg font-bold">{t('points.title')}</h1>
           </div>
         </div>
       </header>
@@ -210,7 +213,7 @@ const ManagePoints = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Trophy className="h-5 w-5 text-primary" /> أفضل الأعضاء
+              <Trophy className="h-5 w-5 text-primary" /> {t('points.top_members')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -225,8 +228,8 @@ const ManagePoints = () => {
                         <div className="text-4xl font-bold text-primary">#{index + 1}</div>
                         <div>
                           <h3 className="font-bold">{member.memberName}</h3>
-                          <p className="text-sm text-muted-foreground">{member.role || "بدون دور"}</p>
-                          <p className="text-2xl font-bold text-primary mt-2">{member.points} نقطة</p>
+                          <p className="text-sm text-muted-foreground">{member.role || t('points.no_role')}</p>
+                          <p className="text-2xl font-bold text-primary mt-2">{member.points} {t('points.unit')}</p>
                         </div>
                       </div>
                     </CardContent>
@@ -239,9 +242,9 @@ const ManagePoints = () => {
         {/* سجل النقاط */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>سجل النقاط</CardTitle>
+            <CardTitle>{t('points.history.title')}</CardTitle>
             <Button onClick={() => setIsDialogOpen(true)}>
-              <Plus className="ml-2 h-4 w-4" /> إضافة نقاط
+              <Plus className="ms-2 h-4 w-4" /> {t('points.history.add')}
             </Button>
           </CardHeader>
           <CardContent>
@@ -253,7 +256,7 @@ const ManagePoints = () => {
                   onClick={() => setIsDeleteDialogOpen(true)}
                   className="text-destructive hover:bg-destructive/10 gap-2"
                 >
-                  <Trash2 className="h-4 w-4" /> مسح السجل بالكامل
+                  <Trash2 className="h-4 w-4" /> {t('points.history.clear_all')}
                 </Button>
               </div>
             )}
@@ -261,10 +264,11 @@ const ManagePoints = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-right">التاريخ</TableHead>
-                    <TableHead className="text-right">الاسم</TableHead>
-                    <TableHead className="text-center">النقاط</TableHead>
-                    <TableHead className="text-right">السبب</TableHead>
+                    {/* استخدام text-start لضبط المحاذاة */}
+                    <TableHead className="text-start">{t('points.history.date')}</TableHead>
+                    <TableHead className="text-start">{t('table.member')}</TableHead>
+                    <TableHead className="text-center">{t('table.points')}</TableHead>
+                    <TableHead className="text-start">{t('points.history.reason')}</TableHead>
                     <TableHead className="w-[50px]"></TableHead>
                   </TableRow>
                 </TableHeader>
@@ -272,7 +276,7 @@ const ManagePoints = () => {
                   {isHistoryLoading ? (
                     <TableRow><TableCell colSpan={5} className="text-center py-4"><Loader2 className="animate-spin mx-auto" /></TableCell></TableRow>
                   ) : history.length === 0 ? (
-                    <TableRow><TableCell colSpan={5} className="text-center py-10">لا توجد عمليات</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={5} className="text-center py-10">{t('points.history.no_data')}</TableCell></TableRow>
                   ) : (
                     history.map((transaction) => (
                       <TableRow key={transaction.pointHistoryId} className="group">
@@ -309,15 +313,15 @@ const ManagePoints = () => {
 
         {/* All Members Table */}
         <Card>
-          <CardHeader><CardTitle>قائمة النقاط الكاملة</CardTitle></CardHeader>
+          <CardHeader><CardTitle>{t('points.list.title')}</CardTitle></CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="text-center">الترتيب</TableHead>
-                  <TableHead className="text-right">الاسم</TableHead>
-                  <TableHead className="text-right">الدور</TableHead>
-                  <TableHead className="text-center">النقاط</TableHead>
+                  <TableHead className="text-center">{t('points.list.rank')}</TableHead>
+                  <TableHead className="text-start">{t('table.member')}</TableHead>
+                  <TableHead className="text-start">{t('table.role')}</TableHead>
+                  <TableHead className="text-center">{t('table.points')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -325,7 +329,7 @@ const ManagePoints = () => {
                   <TableRow key={m.memberId}>
                     <TableCell className="text-center font-medium">{i + 1}</TableCell>
                     <TableCell className="font-medium">{m.memberName}</TableCell>
-                    <TableCell><span className="px-2 py-0.5 rounded-full text-xs bg-blue-100 text-blue-800">{m.role || "Member"}</span></TableCell>
+                    <TableCell><span className="px-2 py-0.5 rounded-full text-xs bg-blue-100 text-blue-800">{m.role || t('table.role.default')}</span></TableCell>
                     <TableCell className="text-center font-bold text-primary">{m.points}</TableCell>
                   </TableRow>
                 ))}
@@ -340,22 +344,22 @@ const ManagePoints = () => {
       {/* 1. إضافة نقاط */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>إضافة نقاط للعضو</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{t('points.dialog.add_title')}</DialogTitle></DialogHeader>
           <div className="grid gap-4 py-4">
             <MemberSelect members={members} formData={formData} setFormData={setFormData} fetchMembers={fetchMembers} />
             <div className="grid gap-2">
-              <Label>النقاط</Label>
+              <Label>{t('points.dialog.points_label')}</Label>
               <Input type="number" onChange={(e) => setFormData({ ...formData, points: parseInt(e.target.value) || 0 })} />
             </div>
             <div className="grid gap-2">
-              <Label>السبب</Label>
+              <Label>{t('points.dialog.reason_label')}</Label>
               <Textarea onChange={(e) => setFormData({ ...formData, reason: e.target.value })} />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>إلغاء</Button>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>{t('btn.cancel')}</Button>
             <Button onClick={handleSave} disabled={isSubmitting}>
-              {isSubmitting ? <Loader2 className="animate-spin" /> : "حفظ النقاط"}
+              {isSubmitting ? <Loader2 className="animate-spin" /> : t('points.dialog.btn_save')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -369,17 +373,17 @@ const ManagePoints = () => {
               <Trash2 className="h-6 w-6 text-destructive" />
             </div>
             <DialogHeader>
-              <DialogTitle className="text-center">تأكيد حذف العملية</DialogTitle>
+              <DialogTitle className="text-center">{t('points.dialog.delete_single_title')}</DialogTitle>
               <DialogDescription className="text-center">
-                هل أنت متأكد من حذف هذه العملية من السجل؟<br/>
-                <span className="text-xs text-destructive">سيتم تعديل نقاط العضو تلقائياً بعد الحذف.</span>
+                {t('points.dialog.delete_single_desc')}<br/>
+                <span className="text-xs text-destructive">{t('points.dialog.delete_single_note')}</span>
               </DialogDescription>
             </DialogHeader>
           </div>
           <DialogFooter className="gap-2 sm:justify-center">
-            <Button variant="ghost" onClick={() => setIsSingleDeleteDialogOpen(false)} disabled={isSubmitting}>إلغاء</Button>
+            <Button variant="ghost" onClick={() => setIsSingleDeleteDialogOpen(false)} disabled={isSubmitting}>{t('btn.cancel')}</Button>
             <Button variant="destructive" onClick={handleSingleDelete} disabled={isSubmitting}>
-              {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "نعم، احذف"}
+              {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : t('points.dialog.btn_delete')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -393,14 +397,14 @@ const ManagePoints = () => {
               <AlertTriangle className="h-6 w-6 text-destructive" />
             </div>
             <DialogHeader>
-              <DialogTitle className="text-center">مسح السجل بالكامل</DialogTitle>
-              <DialogDescription className="text-center">هذا الإجراء سيقوم بحذف جميع العمليات نهائياً.</DialogDescription>
+              <DialogTitle className="text-center">{t('points.dialog.delete_all_title')}</DialogTitle>
+              <DialogDescription className="text-center">{t('points.dialog.delete_all_desc')}</DialogDescription>
             </DialogHeader>
           </div>
           <DialogFooter className="gap-2 sm:justify-center">
-            <Button variant="ghost" onClick={() => setIsDeleteDialogOpen(false)}>إلغاء</Button>
+            <Button variant="ghost" onClick={() => setIsDeleteDialogOpen(false)}>{t('btn.cancel')}</Button>
             <Button variant="destructive" onClick={clearAllTransactions} disabled={isSubmitting}>
-               {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "احذف الكل"}
+               {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : t('points.dialog.btn_delete_all')}
             </Button>
           </DialogFooter>
         </DialogContent>
