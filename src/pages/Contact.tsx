@@ -8,8 +8,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Mail, Phone, MapPin } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext"; // Import hook
 
 const Contact = () => {
+  const { t, language } = useLanguage(); // Use the hook
+  const isRTL = language === 'ar';
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -22,14 +26,14 @@ const Contact = () => {
     
     // Validation
     if (!formData.name || !formData.email || !formData.message) {
-      toast.error("الرجاء ملء جميع الحقول المطلوبة");
+      toast.error(t('contact.toast.error'));
       return;
     }
 
     // Here you would typically send the data to your backend
     console.log("Form submitted:", formData);
     
-    toast.success("تم إرسال رسالتك بنجاح! سنتواصل معك قريباً");
+    toast.success(t('contact.toast.success'));
     
     // Reset form
     setFormData({
@@ -41,15 +45,17 @@ const Contact = () => {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen" dir={isRTL ? 'rtl' : 'ltr'}>
       <Header />
 
       {/* Hero Section */}
       <section className="py-20 gradient-hero">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-5xl md:text-6xl font-black text-white mb-6">اتصل بنا</h1>
+          <h1 className="text-5xl md:text-6xl font-black text-white mb-6">
+            {t('contact.hero.title')}
+          </h1>
           <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
-            نحن هنا للإجابة على استفساراتك والترحيب بأفكارك
+            {t('contact.hero.subtitle')}
           </p>
         </div>
       </section>
@@ -61,58 +67,61 @@ const Contact = () => {
             {/* Contact Form */}
             <Card>
               <CardContent className="p-8">
-                <h2 className="text-2xl font-bold text-foreground mb-6">أرسل لنا رسالة</h2>
+                <h2 className="text-2xl font-bold text-foreground mb-6">
+                  {t('contact.form.title')}
+                </h2>
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="space-y-2">
-                    <Label htmlFor="name">الاسم *</Label>
+                    <Label htmlFor="name">{t('contact.form.name')} *</Label>
                     <Input
                       id="name"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      placeholder="أدخل اسمك الكامل"
+                      placeholder={t('contact.form.name.placeholder')}
                       required
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="email">البريد الإلكتروني *</Label>
+                    <Label htmlFor="email">{t('contact.form.email')} *</Label>
                     <Input
                       id="email"
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       placeholder="example@email.com"
-                      dir="ltr"
+                      dir="ltr" // Email is always LTR
                       required
+                      className={isRTL ? "text-right" : "text-left"} // Align text based on language if needed, but usually email input aligns LTR
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="phone">رقم الهاتف</Label>
+                    <Label htmlFor="phone">{t('contact.form.phone')}</Label>
                     <Input
                       id="phone"
                       type="tel"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       placeholder="+20 123 456 7890"
-                      dir="ltr"
+                      dir="ltr" // Phone is always LTR
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="message">الرسالة *</Label>
+                    <Label htmlFor="message">{t('contact.form.message')} *</Label>
                     <Textarea
                       id="message"
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      placeholder="اكتب رسالتك هنا..."
+                      placeholder={t('contact.form.message.placeholder')}
                       rows={6}
                       required
                     />
                   </div>
 
                   <Button type="submit" className="w-full gradient-hero shadow-racing" size="lg">
-                    إرسال الرسالة
+                    {t('contact.form.submit')}
                   </Button>
                 </form>
               </CardContent>
@@ -121,9 +130,11 @@ const Contact = () => {
             {/* Contact Info */}
             <div className="space-y-8">
               <div>
-                <h2 className="text-2xl font-bold text-foreground mb-6">معلومات التواصل</h2>
+                <h2 className="text-2xl font-bold text-foreground mb-6">
+                  {t('contact.info.title')}
+                </h2>
                 <p className="text-muted-foreground leading-relaxed mb-8">
-                  يمكنك التواصل معنا من خلال النموذج أو عبر وسائل الاتصال التالية
+                  {t('contact.info.subtitle')}
                 </p>
               </div>
 
@@ -136,9 +147,11 @@ const Contact = () => {
                       </div>
                     </div>
                     <div>
-                      <h3 className="font-bold text-foreground mb-1">العنوان</h3>
+                      <h3 className="font-bold text-foreground mb-1">
+                        {t('contact.info.address')}
+                      </h3>
                       <p className="text-muted-foreground">
-                        جامعة جنوب الوادي، قنا، مصر
+                        {t('contact.info.address.value')}
                       </p>
                     </div>
                   </CardContent>
@@ -152,7 +165,9 @@ const Contact = () => {
                       </div>
                     </div>
                     <div>
-                      <h3 className="font-bold text-foreground mb-1">الهاتف</h3>
+                      <h3 className="font-bold text-foreground mb-1">
+                        {t('contact.info.phone')}
+                      </h3>
                       <p className="text-muted-foreground" dir="ltr">
                         +20 123 456 7890
                       </p>
@@ -168,7 +183,9 @@ const Contact = () => {
                       </div>
                     </div>
                     <div>
-                      <h3 className="font-bold text-foreground mb-1">البريد الإلكتروني</h3>
+                      <h3 className="font-bold text-foreground mb-1">
+                        {t('contact.info.email')}
+                      </h3>
                       <p className="text-muted-foreground" dir="ltr">
                         info@qenaracingteam.com
                       </p>
@@ -179,15 +196,17 @@ const Contact = () => {
 
               <Card className="bg-muted/50">
                 <CardContent className="p-6">
-                  <h3 className="font-bold text-foreground mb-3">ساعات العمل</h3>
+                  <h3 className="font-bold text-foreground mb-3">
+                    {t('contact.hours.title')}
+                  </h3>
                   <div className="space-y-2 text-sm text-muted-foreground">
                     <div className="flex justify-between">
-                      <span>السبت - الخميس</span>
+                      <span>{t('contact.hours.weekdays')}</span>
                       <span dir="ltr">9:00 AM - 5:00 PM</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>الجمعة</span>
-                      <span>مغلق</span>
+                      <span>{t('contact.hours.weekend')}</span>
+                      <span>{t('contact.hours.closed')}</span>
                     </div>
                   </div>
                 </CardContent>

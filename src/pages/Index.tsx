@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Zap, Target, Trophy, Users } from "lucide-react";
+// قمنا باستيراد ArrowRight لدعم اللغة الإنجليزية
+import { ArrowLeft, ArrowRight, Zap, Target, Trophy, Users } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProjectCard from "@/components/ProjectCard";
@@ -11,10 +12,17 @@ import workshopImage from "@/assets/team-workshop.jpg";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const Index = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   
+  // متغير لتحديد ما إذا كانت اللغة عربية
+  const isRTL = language === 'ar';
+
+  // تحديد أيقونة السهم بناءً على اللغة
+  // في العربية نستخدم السهم لليسار (للأمام)، وفي الإنجليزية لليمين
+  const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
+
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen" dir={isRTL ? 'rtl' : 'ltr'}>
       <Header />
 
       {/* Hero Section */}
@@ -25,11 +33,17 @@ const Index = () => {
             alt="Qena Racing Team"
             className="h-full w-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent" />
+          {/* تعديل التدرج اللوني ليتناسب مع الاتجاه */}
+          <div className={`absolute inset-0 bg-gradient-to-r ${isRTL ? 'from-black/80 via-black/50 to-transparent' : 'from-black/80 via-black/50 to-transparent'}`} />
         </div>
 
         <div className="relative container mx-auto px-4 h-full flex items-center">
-          <div className="max-w-2xl space-y-6 animate-in fade-in slide-in-from-right-10 duration-1000">
+          {/* تعديل الأنيميشن:
+            في العربية (RTL): slide-in-from-right منطقي (يأتي من "الخلف" للأمام)
+            أو يمكنك عكسه بـ slide-in-from-left إذا أردت أن يدخل من بداية السطر
+            هنا جعلناها ديناميكية لتدخل دائماً من جهة بداية النص
+          */}
+          <div className={`max-w-2xl space-y-6 animate-in fade-in duration-1000 ${isRTL ? 'slide-in-from-right-10' : 'slide-in-from-left-10'}`}>
             <h1 className="text-5xl md:text-7xl font-black text-white leading-tight">
               {t('hero.title')}
             </h1>
@@ -38,9 +52,10 @@ const Index = () => {
             </p>
             <div className="flex flex-wrap gap-4">
               <Link to="/about">
-                <Button size="lg" className="gradient-hero shadow-racing text-lg">
+                <Button size="lg" className="gradient-hero shadow-racing text-lg gap-2">
                   {t('hero.discover')}
-                  <ArrowLeft className="mr-2 h-5 w-5" />
+                  {/* استخدام ms-2 بدلاً من mr-2 لضبط المسافة تلقائياً */}
+                  <ArrowIcon className="h-5 w-5" />
                 </Button>
               </Link>
               <Link to="/projects">
@@ -56,6 +71,7 @@ const Index = () => {
       {/* Stats Section */}
       <section className="py-12 bg-card border-y border-border">
         <div className="container mx-auto px-4">
+          {/* الاتجاه RTL سيقوم بقلب الـ Grid تلقائياً */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="text-center space-y-2">
               <div className="flex justify-center">
@@ -115,9 +131,9 @@ const Index = () => {
                 {t('about.desc2')}
               </p>
               <Link to="/about">
-                <Button size="lg" className="gradient-hero shadow-racing">
+                <Button size="lg" className="gradient-hero shadow-racing gap-2">
                   {t('about.readMore')}
-                  <ArrowLeft className="mr-2 h-5 w-5" />
+                  <ArrowIcon className="h-5 w-5" />
                 </Button>
               </Link>
             </div>
@@ -153,9 +169,9 @@ const Index = () => {
 
           <div className="text-center mt-12">
             <Link to="/projects">
-              <Button size="lg" variant="outline">
+              <Button size="lg" variant="outline" className="gap-2">
                 {t('projects.viewAll')}
-                <ArrowLeft className="mr-2 h-5 w-5" />
+                <ArrowIcon className="h-5 w-5" />
               </Button>
             </Link>
           </div>
@@ -198,9 +214,9 @@ const Index = () => {
             {t('cta.subtitle')}
           </p>
           <Link to="/contact">
-            <Button size="lg" variant="secondary" className="text-lg">
+            <Button size="lg" variant="secondary" className="text-lg gap-2">
               {t('cta.contact')}
-              <ArrowLeft className="mr-2 h-5 w-5" />
+              <ArrowIcon className="h-5 w-5" />
             </Button>
           </Link>
         </div>
