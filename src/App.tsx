@@ -4,6 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "./contexts/LanguageContext";
+
+// Public Pages
 import Index from "./pages/Index";
 import About from "./pages/About";
 import Team from "./pages/Team";
@@ -12,6 +14,9 @@ import Projects from "./pages/Projects";
 import ProjectDetails from "./pages/ProjectDetails";
 import Leaderboard from "./pages/Leaderboard";
 import Contact from "./pages/Contact";
+import Login from "./pages/Login";
+
+// Admin Pages
 import AdminDashboard from "./pages/AdminDashboard";
 import ManageMembers from "./pages/admin/ManageMembers";
 import ManageProjects from "./pages/admin/ManageProjects";
@@ -19,7 +24,8 @@ import ManagePoints from "./pages/admin/ManagePoints";
 import ManageMessages from "./pages/admin/ManageMessages";
 import NotFound from "./pages/NotFound";
 
-import AuthGuard from "@/components/AuthGuard"
+// Auth Component
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +37,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
+            {/* ================= Public Routes ================= */}
             <Route path="/" element={<Index />} />
             <Route path="/about" element={<About />} />
             <Route path="/team" element={<Team />} />
@@ -39,32 +46,19 @@ const App = () => (
             <Route path="/projects/:id" element={<ProjectDetails />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/contact" element={<Contact />} />
-            <Route path="/admin" element={
-              <AuthGuard>
-                <AdminDashboard />
-              </AuthGuard>
-            } />
-            <Route path="/admin/members" element={
-              <AuthGuard>
-                <ManageMembers />
-              </AuthGuard>
-            } />
-            <Route path="/admin/projects" element={
-              <AuthGuard>
-                <ManageProjects />
-              </AuthGuard>
-            } />
-            <Route path="/admin/points" element={
-              <AuthGuard>
-                <ManagePoints />
-              </AuthGuard>
-            } />
-            <Route path="/admin/messages" element={
-              <AuthGuard>
-                <ManageMessages />
-              </AuthGuard>
-            } />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+
+            <Route path="/login" element={<Login />} />
+
+            {/* ================= Protected Admin Routes ================= */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/members" element={<ManageMembers />} />
+              <Route path="/admin/projects" element={<ManageProjects />} />
+              <Route path="/admin/points" element={<ManagePoints />} />
+              <Route path="/admin/messages" element={<ManageMessages />} />
+            </Route>
+
+            {/* Catch-all Route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
