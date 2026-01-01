@@ -22,7 +22,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ArrowLeft, ArrowRight, Plus, Trophy, Loader2, TrendingDown, TrendingUp, Trash2, AlertTriangle } from "lucide-react";
+import { ArrowLeft, ArrowRight, Plus, Trophy, Loader2, TrendingDown, TrendingUp, Trash2, AlertTriangle, Medal, Award } from "lucide-react";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext"; // استيراد الكونتكست
 
@@ -32,6 +32,7 @@ interface Member {
   memberName: string;
   role: string | null;
   points: number;
+  image: string;
 }
 
 interface PointHistory {
@@ -60,7 +61,7 @@ const ManagePoints = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [history, setHistory] = useState<PointHistory[]>([]);
   const [isHistoryLoading, setIsHistoryLoading] = useState(false);
-  
+
   // States للـ Delete
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isSingleDeleteDialogOpen, setIsSingleDeleteDialogOpen] = useState(false);
@@ -109,7 +110,7 @@ const ManagePoints = () => {
   // --- منطق حذف عملية واحدة باستخدام الـ ID ---
   const handleSingleDelete = async () => {
     if (!idToDelete) return;
-    
+
     try {
       setIsSubmitting(true);
       const response = await fetch(
@@ -185,6 +186,13 @@ const ManagePoints = () => {
     }
   };
 
+  const getRankBadge = (index: number) => {
+    if (index === 0) return "bg-gradient-to-r from-yellow-500 to-yellow-600";
+    if (index === 1) return "bg-gradient-to-r from-gray-400 to-gray-500";
+    if (index === 2) return "bg-gradient-to-r from-orange-500 to-orange-600";
+    return "bg-muted";
+  };
+
   if (isLoading) {
     return (
       <div className="h-screen w-full flex items-center justify-center">
@@ -225,7 +233,20 @@ const ManagePoints = () => {
                   <Card key={member.memberId} className="bg-gradient-to-br from-primary/5 to-secondary/5">
                     <CardContent className="p-6">
                       <div className="flex items-center gap-4">
-                        <div className="text-4xl font-bold text-primary">#{index + 1}</div>
+                        <div className="relative">
+                          <img
+                            src={member.image}
+                            alt={member.memberName}
+                            className="w-24 h-24 rounded-full mx-auto object-cover border-4 border-primary"
+                          />
+                          <div
+                            className={`absolute -bottom-2 left-1/2 -translate-x-1/2 ${getRankBadge(
+                              index
+                            )} text-white px-3 py-1 rounded-full text-sm font-bold`}
+                          >
+                            #{index + 1}
+                          </div>
+                        </div>
                         <div>
                           <h3 className="font-bold">{member.memberName}</h3>
                           <p className="text-sm text-muted-foreground">{member.role || t('points.no_role')}</p>
@@ -254,7 +275,7 @@ const ManagePoints = () => {
                   variant="ghost"
                   size="sm"
                   onClick={() => setIsDeleteDialogOpen(true)}
-                  className="text-destructive hover:bg-destructive/10 gap-2"
+                  className="text-destructive hover:bg-destructive/100 gap-2"
                 >
                   <Trash2 className="h-4 w-4" /> {t('points.history.clear_all')}
                 </Button>
@@ -297,7 +318,7 @@ const ManagePoints = () => {
                               setIdToDelete(transaction.pointHistoryId);
                               setIsSingleDeleteDialogOpen(true);
                             }}
-                            className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                            className="h-8 w-8 hover:bg-destructive/100 text-muted-foreground"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -375,7 +396,7 @@ const ManagePoints = () => {
             <DialogHeader>
               <DialogTitle className="text-center">{t('points.dialog.delete_single_title')}</DialogTitle>
               <DialogDescription className="text-center">
-                {t('points.dialog.delete_single_desc')}<br/>
+                {t('points.dialog.delete_single_desc')}<br />
                 <span className="text-xs text-destructive">{t('points.dialog.delete_single_note')}</span>
               </DialogDescription>
             </DialogHeader>
@@ -404,7 +425,7 @@ const ManagePoints = () => {
           <DialogFooter className="gap-2 sm:justify-center">
             <Button variant="ghost" onClick={() => setIsDeleteDialogOpen(false)}>{t('btn.cancel')}</Button>
             <Button variant="destructive" onClick={clearAllTransactions} disabled={isSubmitting}>
-               {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : t('points.dialog.btn_delete_all')}
+              {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : t('points.dialog.btn_delete_all')}
             </Button>
           </DialogFooter>
         </DialogContent>

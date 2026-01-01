@@ -25,7 +25,7 @@ import { useLanguage } from "@/contexts/LanguageContext"; // استيراد ال
 
 export default function ProfessionalMemberSelect({ members, formData, setFormData, fetchMembers }) {
   const { t, language } = useLanguage(); // استخدام اللغة والاتجاه
-    const dir = language === 'ar' ? 'rtl' : 'ltr';
+  const dir = language === 'ar' ? 'rtl' : 'ltr';
 
   const [open, setOpen] = React.useState(false);
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
@@ -73,7 +73,7 @@ export default function ProfessionalMemberSelect({ members, formData, setFormDat
 
       if (!response.ok) throw new Error("Failed to add member");
 
-      toast.success(t('toast.save.success')); // استخدام الترجمة
+      toast.success(t('toast.save.success'));
 
       if (fetchMembers) fetchMembers();
 
@@ -83,7 +83,7 @@ export default function ProfessionalMemberSelect({ members, formData, setFormDat
       setIsDialogOpen(false);
 
     } catch (error) {
-      toast.error(t('toast.save.error')); // استخدام الترجمة
+      toast.error(t('toast.save.error'));
     } finally {
       setIsLoading(false);
     }
@@ -92,7 +92,6 @@ export default function ProfessionalMemberSelect({ members, formData, setFormDat
   const selectedMember = members.find((m) => m.memberId === formData.memberId);
 
   return (
-    // استخدام dir و text-start لدعم الاتجاهين
     <div className="grid gap-2 text-start" dir={dir}>
       <Label className="text-sm font-bold text-slate-700">{t('select.label')}</Label>
 
@@ -107,6 +106,8 @@ export default function ProfessionalMemberSelect({ members, formData, setFormDat
               {selectedMember ? (
                 <>
                   <Avatar className="h-7 w-7">
+                    <AvatarImage src={selectedMember.image} alt={selectedMember.memberName} />
+
                     <AvatarFallback className="bg-primary/100 text-[10px] ">
                       {selectedMember.memberName.substring(0, 2)}
                     </AvatarFallback>
@@ -149,16 +150,26 @@ export default function ProfessionalMemberSelect({ members, formData, setFormDat
                     className="flex items-center gap-3 py-3"
                   >
                     <Avatar className="h-8 w-8">
+                      {/* ADD THIS LINE: Pass the image URL to src */}
+                      <AvatarImage src={m.image} alt={m.memberName} />
+
+                      {/* The fallback will show if src is null or fails to load */}
                       <AvatarFallback className="bg-slate-100 text-[10px] text-muted-foreground">
                         {m.memberName.substring(0, 2)}
                       </AvatarFallback>
                     </Avatar>
+
                     <div className="flex flex-col flex-1">
-                      {/* استخدام text-start بدلاً من text-right */}
                       <span className="font-medium text-start">{m.memberName}</span>
                       <span className="text-[11px] text-start">{m.role || t('points.no_role')}</span>
                     </div>
-                    <Check className={cn("h-4 w-4 text-primary", formData.memberId === m.memberId ? "opacity-100" : "opacity-0")} />
+
+                    <Check
+                      className={cn(
+                        "h-4 w-4 text-primary",
+                        formData.memberId === m.memberId ? "opacity-100" : "opacity-0"
+                      )}
+                    />
                   </CommandItem>
                 ))}
               </CommandGroup>
