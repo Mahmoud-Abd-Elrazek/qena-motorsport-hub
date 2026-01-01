@@ -282,6 +282,22 @@ const translations: Record<Language, Record<string, string>> = {
     'select.registered_group': 'الأعضاء المسجلين',
     'select.empty_state': 'لم يتم العثور على نتائج',
 
+    // Leaderboard Page
+    'leaderboard.hero.title': 'لوحة الصدارة',
+    'leaderboard.hero.desc': 'نظام تحفيزي لتقييم أداء أعضاء الفريق بناءً على المساهمات والإنجازات',
+
+    'leaderboard.full_ranking': 'التصنيف الكامل',
+    'leaderboard.points': 'نقطة',
+
+    // Info Section
+    'leaderboard.info.title': 'كيف يتم حساب النقاط؟',
+    'leaderboard.rules.1': 'المشاركة الفعالة في المشاريع: 50 نقطة',
+    'leaderboard.rules.2': 'قيادة مشروع ناجح: 100 نقطة',
+    'leaderboard.rules.3': 'الحضور المنتظم للاجتماعات: 10 نقاط أسبوعياً',
+    'leaderboard.rules.4': 'تقديم أفكار إبداعية: 25 نقطة',
+    'leaderboard.rules.5': 'المساهمة في التدريب والتوجيه: 30 نقطة',
+
+    'leaderboard.toast.error': 'فشل في تحميل قائمة المتصدرين',
   },
   en: {
     // Header
@@ -512,5 +528,22 @@ const translations: Record<Language, Record<string, string>> = {
     'select.add_new': 'Add New Member',
     'select.registered_group': 'Registered Members',
     'select.empty_state': 'No results found',
+
+    // Leaderboard Page
+    'leaderboard.hero.title': 'Leaderboard',
+    'leaderboard.hero.desc': 'A motivational system to evaluate team members performance based on contributions and achievements',
+
+    'leaderboard.full_ranking': 'Full Ranking',
+    'leaderboard.points': 'pts',
+
+    // Info Section
+    'leaderboard.info.title': 'How are points calculated?',
+    'leaderboard.rules.1': 'Active participation in projects: 50 points',
+    'leaderboard.rules.2': 'Leading a successful project: 100 points',
+    'leaderboard.rules.3': 'Regular meeting attendance: 10 points weekly',
+    'leaderboard.rules.4': 'Submitting creative ideas: 25 points',
+    'leaderboard.rules.5': 'Contribution to training and mentoring: 30 points',
+
+    'leaderboard.toast.error': 'Failed to load leaderboard',
   }
 };

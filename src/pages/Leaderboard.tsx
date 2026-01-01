@@ -2,11 +2,42 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Trophy, Medal, Award } from "lucide-react";
-import { teamMembers } from "@/data/mockData";
+import { toast } from "sonner";
+import { useEffect, useState } from "react";
+import { useLanguage } from "@/contexts/LanguageContext"; // استيراد الكونتكست
+
+// Interfaces
+interface Member {
+  memberId: number;
+  memberName: string;
+  role: string | null;
+  points: number;
+  image: string;
+}
 
 const Leaderboard = () => {
-  // Sort members by points
-  const sortedMembers = [...teamMembers].sort((a, b) => (b.points || 0) - (a.points || 0));
+  const { t, language } = useLanguage();
+  const isRTL = language === 'ar';
+
+  const [members, setMembers] = useState<Member[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchMembers = async () => {
+    try {
+      const response = await fetch("https://qenaracingteam.runasp.net/Racing/Member/GetAllMemberPoinsts");
+      const result = await response.json();
+      if (result.isSuccess) setMembers(result.data);
+    } catch (error) {
+      toast.error(t('leaderboard.toast.error'));
+    } finally {
+        setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMembers();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const getRankIcon = (index: number) => {
     if (index === 0) return <Trophy className="h-8 w-8 text-yellow-500" />;
@@ -23,16 +54,16 @@ const Leaderboard = () => {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen" dir={isRTL ? 'rtl' : 'ltr'}>
       <Header />
 
       {/* Hero Section */}
       <section className="py-20 gradient-hero">
         <div className="container mx-auto px-4 text-center">
           <Trophy className="h-16 w-16 text-white mx-auto mb-6" />
-          <h1 className="text-5xl md:text-6xl font-black text-white mb-6">لوحة الصدارة</h1>
+          <h1 className="text-5xl md:text-6xl font-black text-white mb-6">{t('leaderboard.hero.title')}</h1>
           <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
-            نظام تحفيزي لتقييم أداء أعضاء الفريق بناءً على المساهمات والإنجازات
+            {t('leaderboard.hero.desc')}
           </p>
         </div>
       </section>
@@ -41,19 +72,18 @@ const Leaderboard = () => {
       <section className="py-12 -mt-12">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            {sortedMembers.slice(0, 3).map((member, index) => (
+            {members.slice(0, 3).map((member, index) => (
               <Card
-                key={member.id}
-                className={`${
-                  index === 0 ? "md:order-2 md:scale-110" : index === 1 ? "md:order-1" : "md:order-3"
-                } shadow-racing`}
+                key={member.memberId}
+                className={`${index === 0 ? "md:order-2 md:scale-110" : index === 1 ? "md:order-1" : "md:order-3"
+                  } shadow-racing`}
               >
                 <CardContent className="p-6 text-center space-y-4">
                   <div className="flex justify-center">{getRankIcon(index)}</div>
                   <div className="relative">
                     <img
                       src={member.image}
-                      alt={member.name}
+                      alt={member.memberName}
                       className="w-24 h-24 rounded-full mx-auto object-cover border-4 border-primary"
                     />
                     <div
@@ -65,12 +95,12 @@ const Leaderboard = () => {
                     </div>
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-foreground">{member.name}</h3>
+                    <h3 className="text-lg font-bold text-foreground">{member.memberName}</h3>
                     <p className="text-sm text-muted-foreground">{member.role}</p>
                   </div>
                   <div className="pt-2">
                     <p className="text-3xl font-black text-primary">{member.points}</p>
-                    <p className="text-xs text-muted-foreground">نقطة</p>
+                    <p className="text-xs text-muted-foreground">{t('leaderboard.points')}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -82,10 +112,10 @@ const Leaderboard = () => {
       {/* Full Leaderboard */}
       <section className="py-12">
         <div className="container mx-auto px-4 max-w-4xl">
-          <h2 className="text-2xl font-bold text-foreground mb-6">التصنيف الكامل</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-6">{t('leaderboard.full_ranking')}</h2>
           <div className="space-y-3">
-            {sortedMembers.map((member, index) => (
-              <Card key={member.id} className="hover:shadow-card transition-smooth">
+            {members.map((member, index) => (
+              <Card key={member.memberId} className="hover:shadow-card transition-smooth">
                 <CardContent className="p-4">
                   <div className="flex items-center gap-4">
                     <div className="flex-shrink-0 w-12 text-center">
@@ -95,16 +125,17 @@ const Leaderboard = () => {
                     </div>
                     <img
                       src={member.image}
-                      alt={member.name}
+                      alt={member.memberName}
                       className="w-12 h-12 rounded-full object-cover"
                     />
                     <div className="flex-1">
-                      <h3 className="font-bold text-foreground">{member.name}</h3>
+                      <h3 className="font-bold text-foreground">{member.memberName}</h3>
                       <p className="text-sm text-muted-foreground">{member.role}</p>
                     </div>
-                    <div className="text-left">
+                    {/* استخدام text-end لضبط المحاذاة في اللغتين */}
+                    <div className="text-end">
                       <p className="text-2xl font-bold text-primary">{member.points}</p>
-                      <p className="text-xs text-muted-foreground">نقطة</p>
+                      <p className="text-xs text-muted-foreground">{t('leaderboard.points')}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -119,27 +150,27 @@ const Leaderboard = () => {
         <div className="container mx-auto px-4 max-w-3xl">
           <Card>
             <CardContent className="p-8">
-              <h3 className="text-xl font-bold text-foreground mb-4">كيف يتم حساب النقاط؟</h3>
+              <h3 className="text-xl font-bold text-foreground mb-4">{t('leaderboard.info.title')}</h3>
               <ul className="space-y-2 text-muted-foreground">
                 <li className="flex items-start gap-2">
                   <span className="text-primary font-bold">•</span>
-                  <span>المشاركة الفعالة في المشاريع: 50 نقطة</span>
+                  <span>{t('leaderboard.rules.1')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-primary font-bold">•</span>
-                  <span>قيادة مشروع ناجح: 100 نقطة</span>
+                  <span>{t('leaderboard.rules.2')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-primary font-bold">•</span>
-                  <span>الحضور المنتظم للاجتماعات: 10 نقاط أسبوعياً</span>
+                  <span>{t('leaderboard.rules.3')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-primary font-bold">•</span>
-                  <span>تقديم أفكار إبداعية: 25 نقطة</span>
+                  <span>{t('leaderboard.rules.4')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-primary font-bold">•</span>
-                  <span>المساهمة في التدريب والتوجيه: 30 نقطة</span>
+                  <span>{t('leaderboard.rules.5')}</span>
                 </li>
               </ul>
             </CardContent>
