@@ -22,15 +22,17 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ArrowLeft, ArrowRight, Plus, Pencil, Trash2, Loader2, Linkedin, AlertTriangle } from "lucide-react";
+import { ArrowLeft, ArrowRight, Plus, Pencil, Trash2, Loader2, Linkedin, AlertTriangle, Calendar } from "lucide-react";
 import { toast } from "sonner";
-import { useLanguage } from "@/contexts/LanguageContext"; // استيراد الكونتكست
+import { useLanguage } from "@/contexts/LanguageContext";
 
+// 1. تحديث الواجهة لإضافة Year
 interface Member {
   id: number;
   name: string;
   role: string;
   specialization: string;
+  year: number; // تمت الإضافة
   bio: string;
   points: number;
   linkedInUrl: string;
@@ -46,8 +48,16 @@ const ManageMembers = () => {
   const [members, setMembers] = useState<Member[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<Member | null>(null);
+
+  // 2. تحديث الحالة الابتدائية
   const [formData, setFormData] = useState<Partial<Member>>({
-    name: "", role: "", specialization: "", bio: "", points: 0, linkedInUrl: ""
+    name: "", 
+    role: "", 
+    specialization: "", 
+    year: new Date().getFullYear(),
+    bio: "", 
+    points: 0, 
+    linkedInUrl: ""
   });
 
   const [page, setPage] = useState(1);
@@ -106,11 +116,14 @@ const ManageMembers = () => {
 
       const data = await response.json();
       const list = Array.isArray(data.data) ? data.data : [];
-      const mappedMembers: Member[] = list.map((m) => ({
+      
+      // 3. تحديث تعيين البيانات القادمة من السيرفر
+      const mappedMembers: Member[] = list.map((m: any) => ({
         id: m.id,
         name: m.name,
         role: m.role,
         specialization: m.specialization,
+        year: m.year || m.Year || new Date().getFullYear(), // استقبال السنة
         bio: m.bio,
         points: m.points,
         linkedInUrl: m.linkedInUrl || "",
@@ -134,7 +147,7 @@ const ManageMembers = () => {
       if (entries[0].isIntersecting && hasMore) {
         setPage(prev => prev + 1);
       }
-    });
+    }, { threshold: 1.0 }); // تحسين بسيط للـ Observer
 
     if (node) observer.current.observe(node);
   }, [isLoading, hasMore]);
@@ -146,7 +159,8 @@ const ManageMembers = () => {
   const handleSave = async () => {
     if (isLoading) return;
 
-    if (!formData.name || !formData.role || formData.points === undefined || !formData.specialization || !formData.bio) {
+    // التحقق من الحقول (يمكنك إضافة year للتحقق إذا كان مطلوباً)
+    if (!formData.name || !formData.role || formData.points === undefined || !formData.specialization || !formData.bio || !formData.year) {
       toast.error(t('form.required'));
       return;
     }
@@ -160,6 +174,7 @@ const ManageMembers = () => {
     data.append("Specialization", formData.specialization || "");
     data.append("Bio", formData.bio || "");
     data.append("Points", (formData.points || 0).toString());
+    data.append("Year", (formData.year || new Date().getFullYear()).toString()); // 4. إرسال السنة للباك اند
     data.append("LinkedInUrl", formData.linkedInUrl || "");
     if (formData.image) data.append("Image", formData.image);
 
@@ -194,14 +209,27 @@ const ManageMembers = () => {
     }
   };
 
+  // دالة مساعدة لفتح الديالوج وإعادة تعيين القيم
+  const handleOpenAddDialog = () => {
+    setEditingMember(null);
+    setFormData({
+        name: "", 
+        role: "", 
+        specialization: "", 
+        year: new Date().getFullYear(), // إعادة تعيين السنة
+        bio: "", 
+        points: 0, 
+        linkedInUrl: ""
+    });
+    setIsDialogOpen(true);
+  }
+
   return (
-    // استخدام dir من الكونتكست لضبط اتجاه الصفحة بالكامل
     <div className="min-h-screen bg-muted/30 pb-10 font-sans" dir={dir}>
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Button variant="ghost" onClick={() => navigate("/admin")} className="gap-2">
-            {/* تغيير أيقونة السهم بناءً على الاتجاه */}
             {language === 'ar' ? <ArrowRight className="h-4 w-4" /> : <ArrowLeft className="h-4 w-4" />}
             {t('manage.members.back')}
           </Button>
@@ -215,8 +243,8 @@ const ManageMembers = () => {
             <CardTitle className="text-2xl">
               {t('manage.members.list')} <span className="text-muted-foreground text-lg">({members.length})</span>
             </CardTitle>
-            <Button onClick={() => { setEditingMember(null); setFormData({}); setIsDialogOpen(true); }}>
-              <Plus className="ms-2 h-5 w-5" /> {/* استخدمنا ms-2 بدلاً من ml-2 */}
+            <Button onClick={handleOpenAddDialog}>
+              <Plus className="ms-2 h-5 w-5" />
               {t('manage.members.add')}
             </Button>
           </CardHeader>
@@ -224,7 +252,6 @@ const ManageMembers = () => {
             <Table>
               <TableHeader className="bg-muted/50">
                 <TableRow>
-                  {/* استخدام text-start لضبط المحاذاة تلقائياً */}
                   <TableHead className="text-start">{t('table.member')}</TableHead>
                   <TableHead className="text-start">{t('table.role')}</TableHead>
                   <TableHead className="text-center">{t('table.points')}</TableHead>
@@ -244,7 +271,7 @@ const ManageMembers = () => {
                         </Avatar>
                         <div className="flex flex-col">
                           <span className="font-bold text-base">{member.name}</span>
-                          <span className="text-xs text-muted-foreground">{member.specialization}</span>
+                          <span className="text-xs text-muted-foreground">{member.specialization} - {member.year}</span> {/* عرض السنة بجانب التخصص اختياري */}
                         </div>
                       </div>
                     </TableCell>
@@ -286,7 +313,6 @@ const ManageMembers = () => {
               </TableBody>
             </Table>
 
-            {/* Infinite Scroll Trigger Area */}
             <div ref={lastMemberRef} className="py-8 flex justify-center">
               {isLoading ? (
                 <div className="flex items-center gap-2 text-muted-foreground">
@@ -302,13 +328,14 @@ const ManageMembers = () => {
 
       {/* Dialog: Add/Edit */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-xl">
+        <DialogContent className="max-w-xl max-h-[100vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingMember ? t('dialog.edit.title') : t('dialog.add.title')}</DialogTitle>
             <DialogDescription>{t('dialog.desc')}</DialogDescription>
           </DialogHeader>
 
           <div className="grid gap-6 py-4">
+            {/* Image Upload */}
             <div className="flex items-center gap-6 bg-muted/30 p-4 rounded-lg">
               <Avatar className="h-20 w-20 border-2 border-background shadow-sm">
                 <AvatarImage src={formData.image ? URL.createObjectURL(formData.image) : formData.currentImageUrl} className="object-cover" />
@@ -327,6 +354,7 @@ const ManageMembers = () => {
               </div>
             </div>
 
+            {/* Row 1: Name & Role */}
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label>{t('form.name')}</Label>
@@ -346,22 +374,41 @@ const ManageMembers = () => {
               </div>
             </div>
 
+            {/* Row 2: Specialization & Year (New) */}
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label>{t('form.specialization')}</Label>
                 <Input value={formData.specialization} onChange={(e) => setFormData({ ...formData, specialization: e.target.value })} />
               </div>
+              {/* 5. إضافة حقل السنة في ال UI */}
               <div className="grid gap-2">
-                <Label>{t('table.points')}</Label>
-                <Input type="number" value={formData.points} onChange={(e) => setFormData({ ...formData, points: parseInt(e.target.value) || 0 })} />
+                <Label className="flex items-center gap-2">
+                     <Calendar className="h-4 w-4 text-muted-foreground" />
+                     {t('form.year') || "السنة الدراسية"} 
+                </Label>
+                <Input 
+                    type="number" 
+                    min="2000" 
+                    max="2099" 
+                    value={formData.year} 
+                    onChange={(e) => setFormData({ ...formData, year: parseInt(e.target.value) || 0 })} 
+                />
               </div>
             </div>
 
+            {/* Row 3: Points */}
+             <div className="grid gap-2">
+                <Label>{t('table.points')}</Label>
+                <Input type="number" value={formData.points} onChange={(e) => setFormData({ ...formData, points: parseInt(e.target.value) || 0 })} />
+             </div>
+
+            {/* Row 4: Bio */}
             <div className="grid gap-2">
               <Label>{t('form.bio')}</Label>
               <Textarea rows={3} value={formData.bio} onChange={(e) => setFormData({ ...formData, bio: e.target.value })} />
             </div>
 
+            {/* Row 5: LinkedIn */}
             <div className="grid gap-2">
               <Label className="flex items-center gap-2 text-blue-700">
                 <Linkedin className="h-4 w-4" /> {t('form.linkedin')}

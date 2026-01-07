@@ -183,6 +183,8 @@ const translations: Record<Language, Record<string, string>> = {
     'manage.members.back': 'العودة للوحة التحكم',
     'manage.members.list': 'قائمة الفريق',
     'manage.members.add': 'إضافة عضو جديد',
+    "form.year": "السنة",
+
 
     // Table Headers
     'table.member': 'العضو',
@@ -490,6 +492,7 @@ const translations: Record<Language, Record<string, string>> = {
     'manage.members.back': 'Back to Dashboard',
     'manage.members.list': 'Team List',
     'manage.members.add': 'Add New Member',
+    "form.year": "Year",
 
     // Table Headers
     'table.member': 'Member',
