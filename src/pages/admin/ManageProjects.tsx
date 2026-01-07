@@ -12,7 +12,8 @@ import { Badge } from "@/components/ui/badge";
 import {
   ArrowRight, ArrowLeft, Plus, Pencil, Trash2, Loader2,
   Upload, X, Image as ImageIcon, Settings, Layers, ChevronLeft, ChevronRight,
-  AlertTriangle
+  AlertTriangle,
+  Info
 } from "lucide-react";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -412,7 +413,19 @@ const ManageProjects = () => {
             <div className="space-y-6">
               {/* Main Image */}
               <div className="space-y-2">
-                <Label className="font-bold flex items-center gap-2"><ImageIcon className="h-4 w-4" /> {t('projects.form.main_img')}</Label>
+                <div className="flex flex-col gap-1">
+                  <Label className="font-bold flex items-center gap-2">
+                    <ImageIcon className="h-4 w-4" /> {t('projects.form.main_img')}
+                  </Label>
+
+                  {/* --- بداية كود الـ Hint --- */}
+                  <div className="flex items-start gap-2 p-2 bg-amber-50 border border-amber-200 rounded-md text-amber-800 text-xs">
+                    <Info className="h-4 w-4 shrink-0 mt-0.5" />
+                    <span>{t('projects.form.main_img_hint')}</span>
+                  </div>
+                  {/* --- نهاية كود الـ Hint --- */}
+                </div>
+
                 <div className="relative aspect-video rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden group hover:border-primary transition-colors">
                   {mainImagePreview ? (
                     <>

@@ -356,6 +356,8 @@ const translations: Record<Language, Record<string, string>> = {
     'projects.toast.update_success': 'تم تحديث المشروع',
     'projects.toast.add_success': 'تم إضافة المشروع',
     'projects.toast.network_error': 'خطأ في الشبكة',
+
+    'projects.form.main_img_hint': 'تنبيه: إذا تم حذف الصورة الرئيسية، يجب رفع صورة بديلة لإتمام الحفظ.',
   },
   en: {
     // Header
@@ -660,5 +662,7 @@ const translations: Record<Language, Record<string, string>> = {
     'projects.toast.update_success': 'Project updated successfully',
     'projects.toast.add_success': 'Project added successfully',
     'projects.toast.network_error': 'Network error',
+
+    'projects.form.main_img_hint': 'Note: If the main image is deleted, a replacement must be uploaded to save.',
   }
 };
