@@ -298,6 +298,64 @@ const translations: Record<Language, Record<string, string>> = {
     'leaderboard.rules.5': 'المساهمة في التدريب والتوجيه: 30 نقطة',
 
     'leaderboard.toast.error': 'فشل في تحميل قائمة المتصدرين',
+
+
+    // Manage Projects Page
+    'projects.manage.title': 'إدارة مشاريع الفريق',
+    'projects.list.title': 'المشاريع الحالية',
+    'projects.add_new': 'إضافة مشروع جديد',
+    'projects.loading': 'جاري جلب المشاريع...',
+
+    // Table
+    'projects.table.project': 'المشروع',
+    'projects.table.category': 'الفئة',
+    'projects.table.status': 'الحالة',
+    'projects.table.year': 'السنة',
+    'projects.table.actions': 'الإجراءات',
+    'projects.status.completed': 'مكتمل',
+    'projects.status.running': 'قيد التنفيذ',
+
+    // Pagination
+    'pagination.page': 'الصفحة',
+    'pagination.of': 'من',
+    'pagination.next': 'التالي',
+    'pagination.prev': 'السابق',
+
+    // Dialog (Add/Edit)
+    'projects.dialog.edit_title': 'تعديل بيانات المشروع',
+    'projects.dialog.add_title': 'إضافة مشروع جديد للأسطول',
+
+    'projects.form.title': 'عنوان المشروع *',
+    'projects.form.title_ph': 'مثال: سيارة السباق QR-25',
+    'projects.form.category': 'الفئة',
+    'projects.form.category_ph': 'كهربائية / وقود',
+    'projects.form.year': 'السنة',
+    'projects.form.status': 'الحالة',
+    'projects.form.desc': 'وصف موجز للمشروع',
+    'projects.form.desc_ph': 'تكلم عن أهداف المشروع وما تم إنجازه...',
+
+    'projects.form.main_img': 'الصورة الرئيسية',
+    'projects.form.upload_hint': 'انقر لرفع الصورة الرئيسية',
+    'projects.form.delete_img': 'حذف',
+
+    'projects.form.gallery': 'معرض الصور',
+    'projects.form.specs': 'المواصفات التقنية',
+    'projects.form.specs_ph': 'مثال: محرك بقوة 400 حصان',
+
+    // Delete Dialog
+    'projects.delete.title': 'تأكيد الحذف',
+    'projects.delete.desc': 'هل أنت متأكد من حذف المشروع',
+    'projects.delete.warning': 'لا يمكن التراجع عن هذا الإجراء وسيتم فقدان جميع البيانات المتعلقة به.',
+    'projects.delete.confirm': 'حذف نهائي',
+
+    // Toasts
+    'projects.toast.load_error': 'فشل في تحميل البيانات',
+    'projects.toast.delete_success': 'تم حذف المشروع بنجاح',
+    'projects.toast.delete_error': 'فشل الحذف، حاول مرة أخرى',
+    'projects.toast.title_required': 'يرجى إدخال عنوان المشروع',
+    'projects.toast.update_success': 'تم تحديث المشروع',
+    'projects.toast.add_success': 'تم إضافة المشروع',
+    'projects.toast.network_error': 'خطأ في الشبكة',
   },
   en: {
     // Header
@@ -545,5 +603,62 @@ const translations: Record<Language, Record<string, string>> = {
     'leaderboard.rules.5': 'Contribution to training and mentoring: 30 points',
 
     'leaderboard.toast.error': 'Failed to load leaderboard',
+
+    // Manage Projects Page
+    'projects.manage.title': 'Project Management',
+    'projects.list.title': 'Current Projects',
+    'projects.add_new': 'Add New Project',
+    'projects.loading': 'Fetching projects...',
+
+    // Table
+    'projects.table.project': 'Project',
+    'projects.table.category': 'Category',
+    'projects.table.status': 'Status',
+    'projects.table.year': 'Year',
+    'projects.table.actions': 'Actions',
+    'projects.status.completed': 'Completed',
+    'projects.status.running': 'Running',
+
+    // Pagination
+    'pagination.page': 'Page',
+    'pagination.of': 'of',
+    'pagination.next': 'Next',
+    'pagination.prev': 'Previous',
+
+    // Dialog (Add/Edit)
+    'projects.dialog.edit_title': 'Edit Project Details',
+    'projects.dialog.add_title': 'Add New Project',
+
+    'projects.form.title': 'Project Title *',
+    'projects.form.title_ph': 'Ex: Racing Car QR-25',
+    'projects.form.category': 'Category',
+    'projects.form.category_ph': 'Electric / Fuel',
+    'projects.form.year': 'Year',
+    'projects.form.status': 'Status',
+    'projects.form.desc': 'Project Description',
+    'projects.form.desc_ph': 'Talk about project goals and achievements...',
+
+    'projects.form.main_img': 'Main Image',
+    'projects.form.upload_hint': 'Click to upload main image',
+    'projects.form.delete_img': 'Remove',
+
+    'projects.form.gallery': 'Gallery',
+    'projects.form.specs': 'Technical Specs',
+    'projects.form.specs_ph': 'Ex: 400HP Engine',
+
+    // Delete Dialog
+    'projects.delete.title': 'Confirm Delete',
+    'projects.delete.desc': 'Are you sure you want to delete project',
+    'projects.delete.warning': 'This action cannot be undone and all related data will be lost.',
+    'projects.delete.confirm': 'Delete Permanently',
+
+    // Toasts
+    'projects.toast.load_error': 'Failed to load data',
+    'projects.toast.delete_success': 'Project deleted successfully',
+    'projects.toast.delete_error': 'Delete failed, try again',
+    'projects.toast.title_required': 'Please enter project title',
+    'projects.toast.update_success': 'Project updated successfully',
+    'projects.toast.add_success': 'Project added successfully',
+    'projects.toast.network_error': 'Network error',
   }
 };

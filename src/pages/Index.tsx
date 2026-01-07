@@ -179,6 +179,7 @@ const Index = () => {
       </section>
 
       {/* Sponsors Section */}
+      {/*
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
@@ -203,6 +204,7 @@ const Index = () => {
           </div>
         </div>
       </section>
+      */}
 
       {/* CTA Section */}
       <section className="py-20 gradient-hero">
