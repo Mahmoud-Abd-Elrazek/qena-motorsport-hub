@@ -42,7 +42,8 @@ interface PaginationData {
 
 const ManageProjects = () => {
   const navigate = useNavigate();
-  const { t, language, dir } = useLanguage();
+  const { t, language } = useLanguage();
+  const dir = language === 'ar' ? 'rtl' : 'ltr';
 
   // --- States ---
   const [projects, setProjects] = useState<Project[]>([]);
@@ -86,13 +87,18 @@ const ManageProjects = () => {
   };
 
   // --- 1. Fetch Projects ---
+  // --- 1. Fetch Projects (Logic based on Data Count) ---
   const fetchProjects = async (page: number) => {
     setLoading(true);
     try {
+      const pageSize = 10;
       const response = await fetch(
-        `https://qenaracingteam.runasp.net/Racing/Project/GetAllProjectsList?pageNumber=${page}&pageSize=10`
+        `https://qenaracingteam.runasp.net/Racing/Project/GetAllProjectsList?pageNumber=${page}&pageSize=${pageSize}`
       );
       const result = await response.json();
+
+      // طباعة النتيجة في الكونسول عشان لو حبينا نراجعها
+      console.log("API Response:", result);
 
       const mappedProjects = (result.data || []).map((p: any) => ({
         ...p,
@@ -102,12 +108,21 @@ const ManageProjects = () => {
 
       setProjects(mappedProjects);
 
+      const itemsCount = mappedProjects.length;
+
+      const manualHasNext = itemsCount === pageSize;
+      const manualHasPrevious = page > 1;
+
+      const serverHasNext = result.hasNext ?? result.HasNext;
+      const finalHasNext = (serverHasNext !== undefined) ? serverHasNext : manualHasNext;
+
       setPagination({
-        currentPage: result.currentPage || page,
-        totalPages: result.totalPages || 1,
-        hasNext: result.hasNext || false,
-        hasPrevious: result.hasPrevious || false
+        currentPage: page,
+        totalPages: result.totalPages || result.TotalPages || (finalHasNext ? page + 1 : page),
+        hasNext: finalHasNext,
+        hasPrevious: manualHasPrevious
       });
+
     } catch (error) {
       console.error(error);
       toast.error(t('projects.toast.load_error'));
