@@ -184,6 +184,7 @@ const translations: Record<Language, Record<string, string>> = {
     'manage.members.list': 'قائمة الفريق',
     'manage.members.add': 'إضافة عضو جديد',
     "form.year": "السنة",
+    "image_processing": "جارِ معالجة وضغط الصورة...",
 
 
     // Table Headers
@@ -308,6 +309,11 @@ const translations: Record<Language, Record<string, string>> = {
     'projects.add_new': 'إضافة مشروع جديد',
     'projects.loading': 'جاري جلب المشاريع...',
 
+    // Image Compression Toasts
+    'projects.toast.compress_main': 'جاري معالجة وضغط الصورة الرئيسية...',
+    'projects.toast.compress_gallery': 'جاري معالجة وضغط صور المعرض...',
+    'projects.toast.compress_error': 'حدث خطأ أثناء معالجة الصور',
+
     // Table
     'projects.table.project': 'المشروع',
     'projects.table.category': 'الفئة',
@@ -359,7 +365,7 @@ const translations: Record<Language, Record<string, string>> = {
     'projects.toast.add_success': 'تم إضافة المشروع',
     'projects.toast.network_error': 'خطأ في الشبكة',
 
-    'projects.form.main_img_hint': 'تنبيه: إذا تم حذف الصورة الرئيسية، يجب رفع صورة بديلة لإتمام الحفظ.',
+    'projects.form.main_img_hint': 'تنبيه: إذا تم حذف الصورة الرئيسية يجب استبدالها. الحد الأقصى المسموح به هو 10 صور (شاملة الصورة الرئيسية).',
   },
   en: {
     // Header
@@ -493,6 +499,11 @@ const translations: Record<Language, Record<string, string>> = {
     'manage.members.list': 'Team List',
     'manage.members.add': 'Add New Member',
     "form.year": "Year",
+
+    // Image Compression Toasts
+    'projects.toast.compress_main': 'Processing and compressing main image...',
+    'projects.toast.compress_gallery': 'Processing and compressing gallery images...',
+    'projects.toast.compress_error': 'Error processing images',
 
     // Table Headers
     'table.member': 'Member',
@@ -666,6 +677,6 @@ const translations: Record<Language, Record<string, string>> = {
     'projects.toast.add_success': 'Project added successfully',
     'projects.toast.network_error': 'Network error',
 
-    'projects.form.main_img_hint': 'Note: If the main image is deleted, a replacement must be uploaded to save.',
+    'projects.form.main_img_hint': 'Note: If the main image is deleted, it must be replaced. Maximum allowed is 10 images (including the main image).',
   }
 };

@@ -12,11 +12,11 @@ import { Badge } from "@/components/ui/badge";
 import {
   ArrowRight, ArrowLeft, Plus, Pencil, Trash2, Loader2,
   Upload, X, Image as ImageIcon, Settings, Layers, ChevronLeft, ChevronRight,
-  AlertTriangle,
-  Info
+  AlertTriangle, Info
 } from "lucide-react";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
+import imageCompression from "browser-image-compression";
 
 // --- Interfaces ---
 interface Project {
@@ -42,8 +42,8 @@ interface PaginationData {
 
 const ManageProjects = () => {
   const navigate = useNavigate();
-  const { t, language } = useLanguage();
-  const dir = language === 'ar' ? 'rtl' : 'ltr'; // تحديد الاتجاه بناءً على اللغة
+  const { t, language, dir } = useLanguage();
+
   // --- States ---
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
@@ -74,6 +74,16 @@ const ManageProjects = () => {
   const [mainImagePreview, setMainImagePreview] = useState<string | null>(null);
   const [galleryPreviews, setGalleryPreviews] = useState<string[]>([]);
   const [currentSpec, setCurrentSpec] = useState("");
+
+  // --- Optimization: Compression Settings ---
+  // تم تقليل الأبعاد لسرعة أكبر مع الحفاظ على جودة ممتازة للويب
+  const compressionOptions = {
+    maxSizeMB: 1,
+    maxWidthOrHeight: 1280, // 1280px أسرع بكثير من 1920px
+    useWebWorker: true,
+    initialQuality: 0.7,
+    fileType: "image/jpeg"
+  };
 
   // --- 1. Fetch Projects ---
   const fetchProjects = async (page: number) => {
@@ -110,7 +120,158 @@ const ManageProjects = () => {
     fetchProjects(pageNumber);
   }, [pageNumber]);
 
-  // --- 2. Delete Logic ---
+  // --- 2. Image Handlers (Optimized) ---
+
+  // معالجة الصورة الرئيسية
+  const handleMainImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      try {
+        const toastId = toast.loading(t('projects.toast.compress_main')); // "جاري معالجة الصورة..."
+
+        const compressedFile = await imageCompression(file, compressionOptions);
+
+        // إعادة تسمية الملف لضمان قبوله في السيرفر
+        const renamedFile = new File([compressedFile], file.name, { type: compressedFile.type });
+
+        setFormData(prev => ({ ...prev, image: renamedFile }));
+        setMainImagePreview(URL.createObjectURL(compressedFile));
+
+        toast.dismiss(toastId);
+      } catch (error) {
+        console.error("Compression Error:", error);
+        toast.error(t('projects.toast.compress_error'));
+      }
+    }
+  };
+
+  // معالجة صور المعرض
+  const handleGalleryChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    try {
+      const msg = language === 'ar' ? `جاري معالجة ${files.length} صور...` : `Processing ${files.length} images...`;
+      const toastId = toast.loading(msg);
+
+      const compressedFilesPromises = files.map(async (file) => {
+        const compressedBlob = await imageCompression(file, compressionOptions);
+        // تحويل الـ Blob إلى File مع الحفاظ على الاسم
+        return new File([compressedBlob], file.name, { type: compressedBlob.type });
+      });
+
+      const compressedFiles = await Promise.all(compressedFilesPromises);
+
+      setFormData(prev => ({ ...prev, gallery: [...prev.gallery, ...compressedFiles] }));
+
+      const newPreviews = compressedFiles.map(file => URL.createObjectURL(file));
+      setGalleryPreviews(prev => [...prev, ...newPreviews]);
+
+      toast.dismiss(toastId);
+    } catch (error) {
+      console.error("Gallery Compression Error:", error);
+      toast.error(t('projects.toast.compress_error'));
+    }
+  };
+
+  const removeGalleryImage = (index: number) => {
+    const itemToRemove = formData.gallery[index];
+    if (typeof itemToRemove === 'string') {
+      const idToDelete = formData.imagePublicId?.[index];
+      if (idToDelete) {
+        setImagesToDelete(prev => [...prev, idToDelete]);
+      }
+    }
+
+    setGalleryPreviews(prev => prev.filter((_, i) => i !== index));
+    setFormData(prev => {
+      const newGallery = prev.gallery.filter((_, i) => i !== index);
+      let newPublicIds = prev.imagePublicId || [];
+      if (typeof itemToRemove === 'string') {
+        newPublicIds = newPublicIds.filter((_, i) => i !== index);
+      }
+      return { ...prev, gallery: newGallery, imagePublicId: newPublicIds };
+    });
+  };
+
+  // --- 3. Save Logic (Fixed 400 Error) ---
+  const handleSave = async () => {
+    if (!formData.title) return toast.error(t('projects.toast.title_required'));
+    setIsSubmitting(true);
+
+    const data = new FormData();
+    data.append("Title", formData.title);
+    data.append("Description", formData.description);
+    data.append("Category", formData.category);
+
+    data.append("Year", `${formData.year}-01-01`);
+
+    data.append("Status", formData.status === 'completed' ? "1" : "0");
+
+    formData.specs.forEach(spec => data.append("Specs", spec));
+
+    // إرسال الصورة الرئيسية
+    if (formData.image) {
+      if (formData.image instanceof File) {
+        data.append("Image", formData.image);
+      } else if (formData.image instanceof Blob) {
+        data.append("Image", formData.image, "main-image.jpg");
+      }
+    }
+
+
+    formData.gallery.forEach((item, index) => {
+      if (item instanceof File) {
+        data.append("Gallery", item);
+      } else if (item instanceof Blob) {
+        data.append("Gallery", item, `gallery-${index}.jpg`);
+      }
+    });
+
+    if (editingProject) {
+      imagesToDelete.forEach((publicId) => {
+        data.append("ImagesToDelete", publicId);
+      });
+    }
+
+    try {
+      const url = editingProject
+        ? `https://qenaracingteam.runasp.net/Racing/Project/UpdateProject/${editingProject.id}`
+        : `https://qenaracingteam.runasp.net/Racing/Project/AddProject`;
+
+      const method = editingProject ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method: method,
+        body: data,
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Server Error:", errorText);
+        // عرض جزء من الخطأ للمستخدم إذا كان مناسباً
+        toast.error(t('projects.toast.load_error'));
+        return;
+      }
+
+      const jsonResult = await response.json();
+
+      if (jsonResult.isSuccess) {
+        toast.success(editingProject ? t('projects.toast.update_success') : t('projects.toast.add_success'));
+        setIsDialogOpen(false);
+        fetchProjects(pageNumber);
+      } else {
+        toast.error(jsonResult.message || t('projects.toast.load_error'));
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error(t('projects.toast.network_error'));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // --- 4. Delete Logic ---
   const initiateDelete = (project: Project) => {
     setProjectToDelete(project);
     setIsDeleteDialogOpen(true);
@@ -139,100 +300,7 @@ const ManageProjects = () => {
     }
   };
 
-  // --- 3. Save (Add / Update) ---
-  const handleSave = async () => {
-    if (!formData.title) return toast.error(t('projects.toast.title_required'));
-    setIsSubmitting(true);
-
-    const data = new FormData();
-    data.append("Title", formData.title);
-    data.append("Description", formData.description);
-    data.append("Category", formData.category);
-    data.append("Year", `${formData.year}-01-01`);
-    data.append("Status", formData.status === 'completed' ? "1" : "0");
-
-    formData.specs.forEach(spec => data.append("Specs", spec));
-
-    if (formData.image instanceof File) {
-      data.append("Image", formData.image);
-    }
-
-    formData.gallery.forEach((item) => {
-      if (item instanceof File) {
-        data.append("Gallery", item);
-      }
-    });
-
-    if (editingProject) {
-      imagesToDelete.forEach((publicId) => {
-        data.append("ImagesToDelete", publicId);
-      });
-    }
-
-    try {
-      const url = editingProject
-        ? `https://qenaracingteam.runasp.net/Racing/Project/UpdateProject/${editingProject.id}`
-        : `https://qenaracingteam.runasp.net/Racing/Project/AddProject`;
-
-      const method = editingProject ? "PUT" : "POST";
-
-      const response = await fetch(url, {
-        method: method,
-        body: data,
-      });
-
-      const jsonResult = await response.json();
-      if (response.ok && jsonResult.isSuccess) {
-        toast.success(editingProject ? t('projects.toast.update_success') : t('projects.toast.add_success'));
-        setIsDialogOpen(false);
-        fetchProjects(pageNumber);
-      } else {
-        toast.error(jsonResult.message || t('projects.toast.load_error'));
-      }
-    } catch (error) {
-      console.error(error);
-      toast.error(t('projects.toast.network_error'));
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  // --- 4. Image Handling ---
-  const handleMainImageChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setFormData(prev => ({ ...prev, image: file }));
-      setMainImagePreview(URL.createObjectURL(file));
-    }
-  };
-
-  const handleGalleryChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    setFormData(prev => ({ ...prev, gallery: [...prev.gallery, ...files] }));
-    const newPreviews = files.map(file => URL.createObjectURL(file));
-    setGalleryPreviews(prev => [...prev, ...newPreviews]);
-  };
-
-  const removeGalleryImage = (index: number) => {
-    const itemToRemove = formData.gallery[index];
-    if (typeof itemToRemove === 'string') {
-      const idToDelete = formData.imagePublicId?.[index];
-      if (idToDelete) {
-        setImagesToDelete(prev => [...prev, idToDelete]);
-      }
-    }
-
-    setGalleryPreviews(prev => prev.filter((_, i) => i !== index));
-    setFormData(prev => {
-      const newGallery = prev.gallery.filter((_, i) => i !== index);
-      let newPublicIds = prev.imagePublicId || [];
-      if (typeof itemToRemove === 'string') {
-        newPublicIds = newPublicIds.filter((_, i) => i !== index);
-      }
-      return { ...prev, gallery: newGallery, imagePublicId: newPublicIds };
-    });
-  };
-
+  // --- Helper: Open Edit Dialog ---
   const handleEditClick = (project: Project) => {
     let yearValue = new Date().getFullYear();
     if (project.year) {
@@ -258,6 +326,7 @@ const ManageProjects = () => {
     setIsDialogOpen(true);
   };
 
+  // --- Helper: Open Add Dialog ---
   const handleAddClick = () => {
     setEditingProject(null);
     setFormData({
@@ -272,7 +341,6 @@ const ManageProjects = () => {
   }
 
   return (
-    // ضبط الاتجاه بناءً على اللغة
     <div className="min-h-screen bg-slate-50/50 pb-10" dir={dir}>
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-md">
@@ -305,7 +373,6 @@ const ManageProjects = () => {
                 <Table>
                   <TableHeader className="bg-slate-50">
                     <TableRow>
-                      {/* استخدام text-start لضبط المحاذاة */}
                       <TableHead className="text-start">{t('projects.table.project')}</TableHead>
                       <TableHead className="text-start">{t('projects.table.category')}</TableHead>
                       <TableHead className="text-center">{t('projects.table.status')}</TableHead>
@@ -348,7 +415,6 @@ const ManageProjects = () => {
                   </span>
                   <div className="flex gap-2">
                     <Button variant="outline" size="sm" disabled={!pagination?.hasPrevious} onClick={() => setPageNumber(prev => prev - 1)}>
-                      {/* تبديل اتجاه الأسهم في الباجينيشن */}
                       {language === 'ar' ? <ChevronRight className="h-4 w-4 ml-1" /> : <ChevronLeft className="h-4 w-4 mr-1" />}
                       {t('pagination.prev')}
                     </Button>
@@ -366,7 +432,6 @@ const ManageProjects = () => {
 
       {/* --- Dialog: Add/Edit --- */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        {/* ضبط الاتجاه للديالوج */}
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 gap-0 border-none shadow-2xl" dir={dir}>
           <div className="p-6 border-b bg-slate-50/80 sticky top-0 z-10 backdrop-blur-sm">
             <DialogTitle className="text-xl font-bold flex items-center gap-2">
@@ -417,13 +482,11 @@ const ManageProjects = () => {
                   <Label className="font-bold flex items-center gap-2">
                     <ImageIcon className="h-4 w-4" /> {t('projects.form.main_img')}
                   </Label>
-
-                  {/* --- بداية كود الـ Hint --- */}
+                  {/* --- Hint: Image Required --- */}
                   <div className="flex items-start gap-2 p-2 bg-amber-50 border border-amber-200 rounded-md text-amber-800 text-xs">
                     <Info className="h-4 w-4 shrink-0 mt-0.5" />
                     <span>{t('projects.form.main_img_hint')}</span>
                   </div>
-                  {/* --- نهاية كود الـ Hint --- */}
                 </div>
 
                 <div className="relative aspect-video rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden group hover:border-primary transition-colors">
@@ -515,7 +578,7 @@ const ManageProjects = () => {
           <DialogFooter className="flex flex-row gap-3 sm:justify-center mt-6">
             <Button
               variant="ghost"
-              className="flex-1"
+              className="flex-1 hover:bg-muted"
               onClick={() => setIsDeleteDialogOpen(false)}
               disabled={isDeleting}
             >
