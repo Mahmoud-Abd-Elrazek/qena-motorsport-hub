@@ -161,6 +161,10 @@ const translations: Record<Language, Record<string, string>> = {
     'admin.nav.points.desc': 'إضافة أو تعديل نقاط الأعضاء بناءً على أدائهم الأسبوعي',
     'admin.nav.points.btn': 'إدارة النقاط',
 
+    'admin.nav.achievements.title': 'نظام الإنجازات',
+    'admin.nav.achievements.desc': 'إضافة أو تعديل الإنجازات',
+    'admin.nav.achievements.btn': 'إدارة الإنجازات',
+
 
     // Login Page
     'login.title': 'لوحة التحكم',
@@ -366,6 +370,75 @@ const translations: Record<Language, Record<string, string>> = {
     'projects.toast.network_error': 'خطأ في الشبكة',
 
     'projects.form.main_img_hint': 'تنبيه: إذا تم حذف الصورة الرئيسية يجب استبدالها. الحد الأقصى المسموح به هو 10 صور (شاملة الصورة الرئيسية).',
+
+
+    // Achievements Page
+    'achievements.title': 'إدارة الإنجازات',
+    'achievements.back': 'الرجوع',
+    'achievements.list.title': 'قائمة الإنجازات',
+    'achievements.add_new': 'إضافة إنجاز',
+    'achievements.loading': 'جاري التحميل...',
+    'achievements.empty': 'لا توجد إنجازات مضافة حتى الآن.',
+
+    // Table
+    'achievements.table.year': 'السنة',
+    'achievements.table.desc': 'الوصف',
+    'achievements.table.actions': 'إجراءات',
+
+    // Dialog (Add/Edit)
+    'achievements.dialog.add_title': 'إضافة إنجاز جديد',
+    'achievements.dialog.edit_title': 'تعديل الإنجاز',
+    'achievements.form.year': 'السنة',
+    'achievements.form.desc': 'وصف الإنجاز',
+    'achievements.form.desc_ph': 'مثال: الفوز بالمركز الأول في مسابقة...',
+
+    // Delete Dialog
+    'achievements.delete.title': 'تأكيد الحذف',
+    'achievements.delete.desc': 'هل أنت متأكد من حذف هذا الإنجاز؟',
+    'achievements.delete.warning': 'لا يمكن التراجع عن هذا الإجراء.',
+    'achievements.delete.confirm': 'نعم، احذف',
+
+    // Toasts
+    'achievements.toast.desc_req': 'يرجى كتابة وصف الإنجاز',
+    'achievements.toast.year_req': 'يرجى تحديد السنة',
+    'achievements.toast.add_success': 'تم إضافة الإنجاز بنجاح',
+    'achievements.toast.update_success': 'تم تعديل الإنجاز بنجاح',
+    'achievements.toast.delete_success': 'تم حذف الإنجاز بنجاح',
+    'achievements.toast.delete_error': 'فشل عملية الحذف',
+    'achievements.toast.load_error': 'فشل تحميل الإنجازات',
+    'achievements.toast.server_error': 'فشل الاتصال بالسيرفر',
+
+    // Team Page
+    'team.hero.title': 'فريق العمل',
+    'team.hero.desc': 'تعرف على الأعضاء المتميزين الذين يشكلون عائلة فريق سباقات قنا',
+
+    // Filters
+    'team.filter.year': 'السنة',
+    'team.filter.year_latest': 'الأحدث (عرض تدريجي)',
+    'team.filter.year_prefix': 'سنة', // لاستخدامها مثل: سنة 2024
+
+    'team.filter.spec': 'التخصص',
+    'team.filter.spec_all': 'كل التخصصات',
+
+    // States
+    'team.loading_data': 'جاري تحميل البيانات...',
+    'team.loading_more': 'جاري التحميل...',
+    'team.load_more_btn': 'عرض أعضاء سنة', // سيتم إضافة السنة بعدها
+
+    // Empty States
+    'team.empty.title': 'لا يوجد أعضاء',
+    'team.empty.desc': 'جرب تغيير الفلاتر للبحث عن نتائج أخرى',
+
+    // Member Details Page
+    'member.not_found': 'العضو غير موجود',
+    'member.back': 'العودة لصفحة الفريق',
+    'member.points': 'نقطة',
+    'member.year_prefix': 'سنة',
+    'member.connect': 'تواصل معي',
+    'member.linkedin_btn': 'زيارة ملف LinkedIn',
+    'member.about_title': 'نبذة عني',
+    'member.no_bio': 'لا توجد نبذة متاحة لهذا العضو حالياً.',
+    'member.total_points': 'إجمالي النقاط المكتسبة',
   },
   en: {
     // Header
@@ -477,6 +550,10 @@ const translations: Record<Language, Record<string, string>> = {
     'admin.nav.points.title': 'Points System',
     'admin.nav.points.desc': 'Add or edit member points based on weekly performance',
     'admin.nav.points.btn': 'Manage Points',
+
+    'admin.nav.achievements.title': 'Achievements System',
+    'admin.nav.achievements.desc': 'Add or edit achievements',
+    'admin.nav.achievements.btn': 'Manage achievements',
 
     // Login Page
     'login.title': 'Admin Dashboard',
@@ -678,5 +755,73 @@ const translations: Record<Language, Record<string, string>> = {
     'projects.toast.network_error': 'Network error',
 
     'projects.form.main_img_hint': 'Note: If the main image is deleted, it must be replaced. Maximum allowed is 10 images (including the main image).',
+
+    // Achievements Page
+    'achievements.title': 'Manage Achievements',
+    'achievements.back': 'Back',
+    'achievements.list.title': 'Achievements List',
+    'achievements.add_new': 'Add Achievement',
+    'achievements.loading': 'Loading...',
+    'achievements.empty': 'No achievements added yet.',
+
+    // Table
+    'achievements.table.year': 'Year',
+    'achievements.table.desc': 'Description',
+    'achievements.table.actions': 'Actions',
+
+    // Dialog (Add/Edit)
+    'achievements.dialog.add_title': 'Add New Achievement',
+    'achievements.dialog.edit_title': 'Edit Achievement',
+    'achievements.form.year': 'Year',
+    'achievements.form.desc': 'Description',
+    'achievements.form.desc_ph': 'Ex: Won 1st place in competition...',
+
+    // Delete Dialog
+    'achievements.delete.title': 'Confirm Delete',
+    'achievements.delete.desc': 'Are you sure you want to delete this achievement?',
+    'achievements.delete.warning': 'This action cannot be undone.',
+    'achievements.delete.confirm': 'Yes, Delete',
+
+    // Toasts
+    'achievements.toast.desc_req': 'Please enter a description',
+    'achievements.toast.year_req': 'Please select a year',
+    'achievements.toast.add_success': 'Achievement added successfully',
+    'achievements.toast.update_success': 'Achievement updated successfully',
+    'achievements.toast.delete_success': 'Achievement deleted successfully',
+    'achievements.toast.delete_error': 'Delete operation failed',
+    'achievements.toast.load_error': 'Failed to load achievements',
+    'achievements.toast.server_error': 'Server connection failed',
+
+    // Team Page
+    'team.hero.title': 'Our Team',
+    'team.hero.desc': 'Meet the distinguished members who form the Qena Racing Team family',
+
+    // Filters
+    'team.filter.year': 'Year',
+    'team.filter.year_latest': 'Latest (Progressive View)',
+    'team.filter.year_prefix': 'Year', // Used like: Year 2024
+
+    'team.filter.spec': 'Specialization',
+    'team.filter.spec_all': 'All Specializations',
+
+    // States
+    'team.loading_data': 'Loading data...',
+    'team.loading_more': 'Loading...',
+    'team.load_more_btn': 'Load members from year',
+
+    // Empty States
+    'team.empty.title': 'No members found',
+    'team.empty.desc': 'Try changing filters to find other results',
+
+    // Member Details Page
+    'member.not_found': 'Member not found',
+    'member.back': 'Back to Team',
+    'member.points': 'pts',
+    'member.year_prefix': 'Year',
+    'member.connect': 'Connect with me',
+    'member.linkedin_btn': 'Visit LinkedIn Profile',
+    'member.about_title': 'About Me',
+    'member.no_bio': 'No bio available for this member.',
+    'member.total_points': 'Total Points Earned',
   }
 };
