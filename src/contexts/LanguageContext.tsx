@@ -439,6 +439,41 @@ const translations: Record<Language, Record<string, string>> = {
     'member.about_title': 'نبذة عني',
     'member.no_bio': 'لا توجد نبذة متاحة لهذا العضو حالياً.',
     'member.total_points': 'إجمالي النقاط المكتسبة',
+
+
+    // Projects Page (Public)
+    'projects.page.title': 'مشاريعنا',
+    'projects.page.desc': 'استكشف مجموعة من أبرز المشاريع والابتكارات التي أنجزها فريقنا',
+
+    'projects.filter.all_categories': 'كل الفئات',
+    'projects.filter.all_years': 'كل السنوات',
+
+    'projects.status.end': 'لقد استعرضت جميع المشاريع.',
+    'projects.status.no_results': 'لم يتم العثور على مشاريع تطابق الفلاتر.',
+    'projects.card.no_desc': 'لا يوجد وصف متاح',
+
+    // Project Details Page
+    'project.details.back': 'العودة لصفحة المشاريع',
+    'project.details.not_found': 'المشروع غير موجود',
+    'project.details.back_to_list': 'العودة للقائمة',
+
+    'project.details.overview': 'نظرة عامة',
+    'project.details.specs': 'المواصفات التقنية',
+    'project.details.gallery': 'معرض الصور',
+
+    'project.details.info_title': 'معلومات المشروع',
+    'project.details.year': 'السنة',
+    'project.details.category': 'الفئة',
+    'project.details.status': 'الحالة',
+    'project.status.active': 'نشط',
+    'project.status.completed': 'مكتمل',
+
+    'project.cta.title': 'هل أعجبك المشروع؟',
+    'project.cta.desc': 'شارك أفكارك معنا أو اطرح أسئلتك حول هذا المشروع',
+    'project.cta.btn': 'تواصل معنا',
+
+    'project.related.similar': 'مشاريع مشابهة',
+    'project.related.latest': 'شاهد أيضاً أحدث مشاريعنا',
   },
   en: {
     // Header
@@ -823,5 +858,39 @@ const translations: Record<Language, Record<string, string>> = {
     'member.about_title': 'About Me',
     'member.no_bio': 'No bio available for this member.',
     'member.total_points': 'Total Points Earned',
+
+    // Projects Page (Public)
+    'projects.page.title': 'Our Projects',
+    'projects.page.desc': 'Explore a collection of our team\'s most notable projects and innovations',
+
+    'projects.filter.all_categories': 'All Categories',
+    'projects.filter.all_years': 'All Years',
+
+    'projects.status.end': 'You have viewed all projects.',
+    'projects.status.no_results': 'No projects found matching your filters.',
+    'projects.card.no_desc': 'No description available',
+
+    // Project Details Page
+    'project.details.back': 'Back to Projects',
+    'project.details.not_found': 'Project Not Found',
+    'project.details.back_to_list': 'Back to List',
+
+    'project.details.overview': 'Overview',
+    'project.details.specs': 'Technical Specifications',
+    'project.details.gallery': 'Image Gallery',
+
+    'project.details.info_title': 'Project Info',
+    'project.details.year': 'Year',
+    'project.details.category': 'Category',
+    'project.details.status': 'Status',
+    'project.status.active': 'Active',
+    'project.status.completed': 'Completed',
+
+    'project.cta.title': 'Like this project?',
+    'project.cta.desc': 'Share your thoughts or ask questions about this project',
+    'project.cta.btn': 'Contact Us',
+
+    'project.related.similar': 'Similar Projects',
+    'project.related.latest': 'Check out our latest projects',
   }
 };
