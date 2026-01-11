@@ -27,6 +27,7 @@ import NotFound from "./pages/NotFound";
 // Auth Component
 import ProtectedRoute from "./components/ProtectedRoute";
 import ManageAchievements from "./pages/admin/ManageAchievements";
+import GeneralSettings from "./pages/admin/GeneralSettings";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +59,7 @@ const App = () => (
               <Route path="/admin/points" element={<ManagePoints />} />
               <Route path="/admin/messages" element={<ManageMessages />} />
               <Route path="/admin/achievements" element={<ManageAchievements />} />
+              <Route path="/admin/GeneralSettings" element={<GeneralSettings />} />
             </Route>
 
             {/* Catch-all Route */}

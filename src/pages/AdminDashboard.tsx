@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Users, FolderKanban, Trophy, LogOut, Languages } from "lucide-react";
+import { Users, FolderKanban, Trophy, LogOut, Languages, Settings } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const AdminDashboard = () => {
@@ -113,6 +113,14 @@ const AdminDashboard = () => {
             btnText={t('admin.nav.achievements.btn')}
             icon={<Trophy className="h-5 w-5" />} 
             onClick={() => navigate("/admin/achievements")} 
+          />
+          
+          <NavCard 
+            title={t('admin.nav.generalSettings.title')} 
+            desc={t('admin.nav.generalSettings.desc')}
+            btnText={t('admin.nav.generalSettings.btn')}
+            icon={<Settings className="h-5 w-5" />} 
+            onClick={() => navigate("/admin/generalSettings")} 
           />
         </div>
       </main>

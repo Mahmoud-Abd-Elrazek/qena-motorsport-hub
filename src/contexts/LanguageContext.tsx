@@ -165,6 +165,10 @@ const translations: Record<Language, Record<string, string>> = {
     'admin.nav.achievements.desc': 'إضافة أو تعديل الإنجازات',
     'admin.nav.achievements.btn': 'إدارة الإنجازات',
 
+    'admin.nav.generalSettings.title': 'الإعدادات العامة',
+    'admin.nav.generalSettings.desc': 'إدارة الإعدادات العامة للنظام',
+    'admin.nav.generalSettings.btn': 'إدارة الإعدادات العامة',
+
 
     // Login Page
     'login.title': 'لوحة التحكم',
@@ -589,6 +593,11 @@ const translations: Record<Language, Record<string, string>> = {
     'admin.nav.achievements.title': 'Achievements System',
     'admin.nav.achievements.desc': 'Add or edit achievements',
     'admin.nav.achievements.btn': 'Manage achievements',
+
+    'admin.nav.generalSettings.title': 'General Settings',
+    'admin.nav.generalSettings.desc': 'Manage general system settings',
+    'admin.nav.generalSettings.btn': 'Manage Settings',
+
 
     // Login Page
     'login.title': 'Admin Dashboard',
