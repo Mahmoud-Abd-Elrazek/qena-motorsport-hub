@@ -8,7 +8,98 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
+    /* --- الأساسيات --- */
     --background: 0 0% 100%;
+    /* خلفية بيضاء */
+    --foreground: 0 0% 6%;
+    /* نص أسود داكن جداً (#0F0F0F) بدلاً من الرمادي */
+
+    /* --- البطاقات --- */
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 6%;
+
+    /* --- النوافذ المنبثقة --- */
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 6%;
+
+    /* --- الألوان الرئيسية (تم التحديث) --- */
+    /* اللون الأساسي: Deep Maroon (#5E0B0B) */
+    --primary: 0 79% 21%;
+    --primary-foreground: 0 0% 100%;
+    /* نص أبيض */
+
+    /* اللون الثانوي: Black Shadow (#0F0F0F) */
+    /* كان برتقالياً سابقاً، الآن أصبح أسود ليعطي فخامة */
+    --secondary: 0 0% 6%;
+    --secondary-foreground: 0 0% 98%;
+    /* نص أبيض */
+
+    /* --- ألوان فرعية --- */
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+
+    /* لون التمييز: Highlight Red (#8B1E1E) */
+    /* يستخدم عند تمرير الماوس */
+    --accent: 0 65% 33%;
+    --accent-foreground: 0 0% 100%;
+
+    /* لون الحذف/التدمير */
+    --destructive: 0 65% 33%;
+    /* جعلناه نفس لون التمييز الأحمر */
+    --destructive-foreground: 0 0% 100%;
+
+    /* --- الحواف والإدخال --- */
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 0 79% 21%;
+    /* حلقة التركيز بنفس لون البراميري */
+
+    --radius: 0.5rem;
+    /* قللت الانحناء قليلاً ليبدو أكثر جدية (اختياري) */
+
+    /* --- متغيرات السباق المخصصة (تم تحديث الهوية) --- */
+    --racing-red: 0 79% 21%;
+    /* #5E0B0B */
+    --racing-orange: 0 65% 33%;
+    /* تم تغيير البرتقالي إلى الأحمر الفاتح (#8B1E1E) للانسجام */
+    --racing-dark: 0 0% 6%;
+    /* #0F0F0F */
+    --racing-gray: 0 0% 25%;
+
+    /* --- التدرجات اللونية (Gradients) --- */
+    /* تدرج من المارون الداكن إلى الأحمر الأفتح قليلاً */
+    --gradient-hero: linear-gradient(135deg, hsl(0 79% 21%) 0%, hsl(0 65% 33%) 100%);
+
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%) 0%, hsl(0 0% 98%) 100%);
+
+    /* تدرج داكن للخلفيات السوداء */
+    --gradient-dark: linear-gradient(135deg, hsl(0 0% 6%) 0%, hsl(0 0% 15%) 100%);
+
+    /* --- الظلال (Shadows) --- */
+    /* ظل أحمر داكن بدلاً من البرتقالي المتوهج */
+    --shadow-racing: 0 10px 40px -10px hsl(0 79% 21% / 0.4);
+    --shadow-card: 0 4px 20px hsl(0 0% 0% / 0.1);
+
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* --- القائمة الجانبية (Sidebar) --- */
+    /* جعلتها داكنة لتتناسب مع طلبك "Dark/Strong" */
+    --sidebar-background: 0 0% 6%;
+    /* خلفية سوداء (#0F0F0F) */
+    --sidebar-foreground: 0 0% 98%;
+    /* نص أبيض */
+    --sidebar-primary: 0 79% 21%;
+    /* العنصر النشط بالأحمر المارون */
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 65% 33%;
+    /* عند الهوفر أحمر أفتح */
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 0 0% 15%;
+    /* حدود خفيفة جداً */
+    --sidebar-ring: 0 79% 21%;
+
+
+    /* --background: 0 0% 100%;
     --foreground: 0 0% 10%;
 
     --card: 0 0% 100%;
@@ -66,7 +157,7 @@ All colors MUST be HSL.
 
     --sidebar-border: 220 13% 91%;
 
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-ring: 217.2 91.2% 59.8%; */
   }
 
   .dark {
@@ -97,7 +188,7 @@ All colors MUST be HSL.
     --border: 0 0% 25%;
     --input: 0 0% 25%;
     --ring: 12 88% 55%;
-    
+
     --gradient-hero: linear-gradient(135deg, hsl(12 88% 55%) 0%, hsl(25 95% 53%) 100%);
     --gradient-card: linear-gradient(145deg, hsl(0 0% 15%) 0%, hsl(0 0% 18%) 100%);
     --shadow-racing: 0 10px 40px -10px hsl(12 88% 55% / 0.5);
@@ -122,7 +213,7 @@ All colors MUST be HSL.
     font-family: 'Tajawal', 'Cairo', sans-serif;
     direction: rtl;
   }
-  
+
   html {
     scroll-behavior: smooth;
   }
@@ -132,23 +223,23 @@ All colors MUST be HSL.
   .gradient-hero {
     background: var(--gradient-hero);
   }
-  
+
   .gradient-card {
     background: var(--gradient-card);
   }
-  
+
   .gradient-dark {
     background: var(--gradient-dark);
   }
-  
+
   .shadow-racing {
     box-shadow: var(--shadow-racing);
   }
-  
+
   .shadow-card {
     box-shadow: var(--shadow-card);
   }
-  
+
   .transition-smooth {
     transition: var(--transition-smooth);
   }
