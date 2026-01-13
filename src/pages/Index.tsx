@@ -1,25 +1,71 @@
+import { useState, useEffect } from "react"; // 1. استيراد هوكس React
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-// قمنا باستيراد ArrowRight لدعم اللغة الإنجليزية
 import { ArrowLeft, ArrowRight, Zap, Target, Trophy, Users } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProjectCard from "@/components/ProjectCard";
-import { projects, sponsors } from "@/data/mockData";
+// import { projects } from "@/data/mockData"; // <-- لم نعد بحاجة لهذا
 import heroImage from "@/assets/hero-racing.jpg";
 import workshopImage from "@/assets/team-workshop.jpg";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useSiteSettings } from "@/contexts/SiteSettingsContext";
+
+// --- تعريف أنواع البيانات (مطابق لما هو موجود في صفحة Projects) ---
+interface ProjectDTO {
+  id: number;
+  name: string;
+  projectCategory: string;
+  year: string;
+  description: string | null;
+  imageUrl: string | null;
+  status: number;
+}
+
+interface ProjectsResponse {
+  data: {
+    data: ProjectDTO[];
+    nextCursor: string | null;
+    hasMore: boolean;
+  };
+}
 
 const Index = () => {
   const { t, language } = useLanguage();
-  
-  // متغير لتحديد ما إذا كانت اللغة عربية
+  const { settings } = useSiteSettings();
   const isRTL = language === 'ar';
-
-  // تحديد أيقونة السهم بناءً على اللغة
-  // في العربية نستخدم السهم لليسار (للأمام)، وفي الإنجليزية لليمين
   const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
+
+  // --- State لتخزين المشاريع ---
+  const [latestProjects, setLatestProjects] = useState<ProjectDTO[]>([]);
+
+  // --- Fetch Data لجلب أحدث 3 مشاريع ---
+  useEffect(() => {
+    const fetchLatestProjects = async () => {
+      try {
+        const response = await fetch("https://qenaracingteam.runasp.net/Racing/Project/GetProjectsWithCursor", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            cursor: null,      // نبدأ من الأول لجلب الأحدث
+            yearFilter: null,
+            category: null,
+            pageSize: 3        // نطلب 3 مشاريع فقط
+          }),
+        });
+
+        const json: ProjectsResponse = await response.json();
+
+        if (json.data && json.data.data) {
+          setLatestProjects(json.data.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch home projects", error);
+      }
+    };
+
+    fetchLatestProjects();
+  }, []);
 
   return (
     <div className="min-h-screen" dir={isRTL ? 'rtl' : 'ltr'}>
@@ -29,32 +75,25 @@ const Index = () => {
       <section className="relative h-[600px] md:h-[700px] overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src={heroImage}
-            alt="Qena Racing Team"
+            src={settings?.data?.heroImageUrl || heroImage}
+            alt={settings?.data?.siteName || "Racing Team image"}
             className="h-full w-full object-cover"
           />
-          {/* تعديل التدرج اللوني ليتناسب مع الاتجاه */}
           <div className={`absolute inset-0 bg-gradient-to-r ${isRTL ? 'from-black/80 via-black/50 to-transparent' : 'from-black/80 via-black/50 to-transparent'}`} />
         </div>
 
         <div className="relative container mx-auto px-4 h-full flex items-center">
-          {/* تعديل الأنيميشن:
-            في العربية (RTL): slide-in-from-right منطقي (يأتي من "الخلف" للأمام)
-            أو يمكنك عكسه بـ slide-in-from-left إذا أردت أن يدخل من بداية السطر
-            هنا جعلناها ديناميكية لتدخل دائماً من جهة بداية النص
-          */}
           <div className={`max-w-2xl space-y-6 animate-in fade-in duration-1000 ${isRTL ? 'slide-in-from-right-10' : 'slide-in-from-left-10'}`}>
             <h1 className="text-5xl md:text-7xl font-black text-white leading-tight">
-              {t('hero.title')}
+              {settings?.data?.heroTitle || t('hero.title')}
             </h1>
             <p className="text-xl md:text-2xl text-white/90 leading-relaxed">
-              {t('hero.subtitle')}
+              {settings?.data?.heroSubtitle || t('hero.subtitle')}
             </p>
             <div className="flex flex-wrap gap-4">
               <Link to="/about">
                 <Button size="lg" className="gradient-hero shadow-racing text-lg gap-2">
                   {t('hero.discover')}
-                  {/* استخدام ms-2 بدلاً من mr-2 لضبط المسافة تلقائياً */}
                   <ArrowIcon className="h-5 w-5" />
                 </Button>
               </Link>
@@ -71,7 +110,6 @@ const Index = () => {
       {/* Stats Section */}
       <section className="py-12 bg-card border-y border-border">
         <div className="container mx-auto px-4">
-          {/* الاتجاه RTL سيقوم بقلب الـ Grid تلقائياً */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="text-center space-y-2">
               <div className="flex justify-center">
@@ -119,17 +157,18 @@ const Index = () => {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
               <div>
-                <p className="text-primary font-bold mb-2">{t('about.tag')}</p>
-                <h2 className="text-4xl md:text-5xl font-black text-foreground leading-tight">
-                  {t('about.title')}
-                </h2>
+                <p className="text-primary font-bold mb-2">
+                  {settings?.data?.homeSectionTitle || t('about.title')}
+                </p>
               </div>
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                {t('about.desc1')}
+              <p className="text-lg text-muted-foreground leading-relaxed whitespace-pre-line">
+                {settings?.data?.homeSectionContent || t('about.desc1')}
               </p>
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                {t('about.desc2')}
-              </p>
+              {!settings?.data?.homeSectionContent && (
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                  {t('about.desc2')}
+                </p>
+              )}
               <Link to="/about">
                 <Button size="lg" className="gradient-hero shadow-racing gap-2">
                   {t('about.readMore')}
@@ -139,16 +178,16 @@ const Index = () => {
             </div>
             <div className="relative">
               <img
-                src={workshopImage}
+                src={settings?.data?.aboutImageUrl || workshopImage}
                 alt="Team Workshop"
-                className="rounded-2xl shadow-racing w-full"
+                className="rounded-2xl shadow-racing w-full h-[400px] object-cover"
               />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Featured Projects */}
+      {/* Featured Projects Section (تم التعديل لعرض البيانات الحقيقية) */}
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
@@ -162,9 +201,27 @@ const Index = () => {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {projects.slice(0, 3).map((project) => (
-              <ProjectCard key={project.id} {...project} />
-            ))}
+            {latestProjects.length > 0 ? (
+              latestProjects.map((project) => {
+                const displayYear = new Date(project.year).getFullYear();
+                return (
+                  <ProjectCard 
+                    key={project.id} 
+                    id={String(project.id)}
+                    title={project.name}
+                    description={project.description || t('projects.card.no_desc')}
+                    image={project.imageUrl || "/placeholder-image.jpg"}
+                    year={displayYear}
+                    category={project.projectCategory}
+                  />
+                );
+              })
+            ) : (
+              // Loading State or Empty State (Optional)
+              <div className="col-span-3 text-center py-8 text-muted-foreground">
+                <p>{t('projects.status.no_results')}</p> 
+              </div>
+            )}
           </div>
 
           <div className="text-center mt-12">
@@ -177,34 +234,6 @@ const Index = () => {
           </div>
         </div>
       </section>
-
-      {/* Sponsors Section */}
-      {/*
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <p className="text-primary font-bold mb-2">{t('sponsors.tag')}</p>
-            <h2 className="text-4xl md:text-5xl font-black text-foreground leading-tight">
-              {t('sponsors.title')}
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {sponsors.map((sponsor) => (
-              <Card key={sponsor.id} className="group hover:shadow-card transition-smooth">
-                <CardContent className="p-8 flex items-center justify-center h-32">
-                  <img
-                    src={sponsor.logo}
-                    alt={sponsor.name}
-                    className="max-h-full max-w-full object-contain grayscale group-hover:grayscale-0 transition-smooth"
-                  />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-      */}
 
       {/* CTA Section */}
       <section className="py-20 gradient-hero">

@@ -7,12 +7,16 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Mail, Phone, MapPin } from "lucide-react";
+import { Mail, Phone, MapPin, Settings } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext"; // Import hook
+
+import { useSiteSettings } from "@/contexts/SiteSettingsContext"; // 1. Import Context
 
 const Contact = () => {
   const { t, language } = useLanguage(); // Use the hook
   const isRTL = language === 'ar';
+
+  const { settings } = useSiteSettings(); // 2. Get Settings
 
   const [formData, setFormData] = useState({
     name: "",
@@ -23,7 +27,7 @@ const Contact = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validation
     if (!formData.name || !formData.email || !formData.message) {
       toast.error(t('contact.toast.error'));
@@ -32,9 +36,9 @@ const Contact = () => {
 
     // Here you would typically send the data to your backend
     console.log("Form submitted:", formData);
-    
+
     toast.success(t('contact.toast.success'));
-    
+
     // Reset form
     setFormData({
       name: "",
@@ -151,7 +155,7 @@ const Contact = () => {
                         {t('contact.info.address')}
                       </h3>
                       <p className="text-muted-foreground">
-                        {t('contact.info.address.value')}
+                        {settings?.data?.address || t('contact.info.address.placeholder')}
                       </p>
                     </div>
                   </CardContent>
@@ -169,7 +173,7 @@ const Contact = () => {
                         {t('contact.info.phone')}
                       </h3>
                       <p className="text-muted-foreground" dir="ltr">
-                        +20 123 456 7890
+                        {settings?.data?.phone || 'unavailable'}
                       </p>
                     </div>
                   </CardContent>
@@ -187,7 +191,7 @@ const Contact = () => {
                         {t('contact.info.email')}
                       </h3>
                       <p className="text-muted-foreground" dir="ltr">
-                        info@qenaracingteam.com
+                        {settings?.data?.email || 'info@qenaracingteam.com'}
                       </p>
                     </div>
                   </CardContent>
@@ -201,12 +205,7 @@ const Contact = () => {
                   </h3>
                   <div className="space-y-2 text-sm text-muted-foreground">
                     <div className="flex justify-between">
-                      <span>{t('contact.hours.weekdays')}</span>
-                      <span dir="ltr">9:00 AM - 5:00 PM</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>{t('contact.hours.weekend')}</span>
-                      <span>{t('contact.hours.closed')}</span>
+                      <span dir="ltr">{settings?.data?.workHours}</span>
                     </div>
                   </div>
                 </CardContent>

@@ -2,14 +2,16 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
 import { Menu, X, Shield, Languages } from "lucide-react";
 import { useState } from "react";
-import { useLanguage } from "@/contexts/LanguageContext"; // تأكد من المسار
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useSiteSettings } from "@/contexts/SiteSettingsContext"; // 1. استيراد الـ Context
 
 const Header = () => {
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
-  // استدعاء الـ Context
-  const { t, toggleLanguage, language } = useLanguage();
+  // 2. استدعاء البيانات
+  const { t, toggleLanguage } = useLanguage();
+  const { settings } = useSiteSettings(); 
 
   const navItems = [
     { path: "/", label: t('nav.home') },
@@ -27,17 +29,28 @@ const Header = () => {
           
           {/* Logo Section */}
           <Link to="/" className="flex items-center gap-3">
-            {/* الشعار الرمزي (يبقى كما هو أو يمكن تغييره) */}
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-secondary shadow-racing">
-              <span className="text-xl font-bold text-white">QRT</span>
-            </div>
-            {/* النصوص المترجمة */}
+            
+            {/* 3. اللوجو الديناميكي */}
+            {settings?.data?.logoImageUrl ? (
+               <img 
+                 src={settings.data.logoImageUrl} 
+                 alt="Logo" 
+                 className="h-10 w-10 object-contain rounded-md" 
+               />
+            ) : (
+               // Fallback في حال عدم وجود لوجو
+               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-secondary shadow-racing">
+                 <span className="text-xl font-bold text-white">QRT</span>
+               </div>
+            )}
+
+            {/* 4. النصوص الديناميكية */}
             <div className="hidden md:block">
               <h1 className="text-lg font-bold text-foreground leading-none mb-1">
-                {t('header.brand')}
+                {settings?.data.siteName || t('header.brand')}
               </h1>
               <p className="text-xs text-muted-foreground font-medium">
-                {t('header.subbrand')}
+                {settings?.data.navbarBio || t('header.subbrand')}
               </p>
             </div>
           </Link>

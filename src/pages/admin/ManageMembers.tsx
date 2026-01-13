@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -25,19 +25,21 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ArrowLeft, ArrowRight, Plus, Pencil, Trash2, Loader2, Linkedin, AlertTriangle, Calendar } from "lucide-react";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
+// 1. استدعاء مكتبة الضغط
+import imageCompression from 'browser-image-compression';
 
-// 1. تحديث الواجهة لإضافة Year
+// --- Interfaces ---
 interface Member {
   id: number;
   name: string;
   role: string;
   specialization: string;
-  year: number; // تمت الإضافة
+  year: number;
   bio: string;
   points: number;
   linkedInUrl: string;
   currentImageUrl?: string;
-  image?: File;
+  image?: File | Blob; // 2. السماح بـ Blob لأن المكتبة قد ترجع Blob
 }
 
 const ManageMembers = () => {
@@ -45,11 +47,11 @@ const ManageMembers = () => {
   const { t, language } = useLanguage();
   const dir = language === 'ar' ? 'rtl' : 'ltr';
 
+  // --- States ---
   const [members, setMembers] = useState<Member[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<Member | null>(null);
 
-  // 2. تحديث الحالة الابتدائية
   const [formData, setFormData] = useState<Partial<Member>>({
     name: "", 
     role: "", 
@@ -68,30 +70,40 @@ const ManageMembers = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [memberToDelete, setMemberToDelete] = useState<Member | null>(null);
 
-  const confirmDelete = async () => {
-    if (!memberToDelete || isLoading) return;
+  // --- 3. إعدادات ضغط الصور ---
+  const compressionOptions = {
+    maxSizeMB: 0.5,          // الحجم الأقصى (نصف ميجا)
+    maxWidthOrHeight: 1000,  // الأبعاد القصوى (مناسب للـ Avatar)
+    useWebWorker: true,      // تحسين الأداء
+    initialQuality: 0.8,     // الجودة
+  };
 
-    setIsLoading(true);
+  // --- 4. دالة معالجة الصور وضغطها ---
+  const handleImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // استخدام مفتاح الترجمة أو نص احتياطي
+    const loadingText = t('toast.processing') || "جارِ معالجة الصورة...";
+    const toastId = toast.loading(loadingText);
+
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`https://qenaracingteam.runasp.net/Racing/Member/DeleteMember/${memberToDelete.id}`, {
-        method: "DELETE",
-        headers: { "Authorization": `Bearer ${token}` },
-      });
-
-      if (!response.ok) throw new Error();
-
-      setMembers(prev => prev.filter(m => m.id !== memberToDelete.id));
-      toast.success(t('toast.delete.success'));
-    } catch {
-      toast.error(t('toast.delete.error'));
-    } finally {
-      setIsLoading(false);
-      setIsDeleteDialogOpen(false);
-      setMemberToDelete(null);
+      const compressedFile = await imageCompression(file, compressionOptions);
+      
+      setFormData(prev => ({ 
+        ...prev, 
+        image: compressedFile 
+      }));
+      
+      toast.dismiss(toastId);
+    } catch (error) {
+      console.error("Compression error:", error);
+      toast.error(t('toast.image_error') || "حدث خطأ أثناء ضغط الصورة");
+      toast.dismiss(toastId);
     }
   };
 
+  // --- Fetch Logic ---
   const fetchMembers = useCallback(async (pageNumber: number) => {
     if (isLoading || (!hasMore && pageNumber !== 1)) return;
 
@@ -117,13 +129,12 @@ const ManageMembers = () => {
       const data = await response.json();
       const list = Array.isArray(data.data) ? data.data : [];
       
-      // 3. تحديث تعيين البيانات القادمة من السيرفر
       const mappedMembers: Member[] = list.map((m: any) => ({
         id: m.id,
         name: m.name,
         role: m.role,
         specialization: m.specialization,
-        year: m.year || m.Year || new Date().getFullYear(), // استقبال السنة
+        year: m.year || m.Year || new Date().getFullYear(),
         bio: m.bio,
         points: m.points,
         linkedInUrl: m.linkedInUrl || "",
@@ -139,6 +150,7 @@ const ManageMembers = () => {
     }
   }, [isLoading, hasMore, navigate, t]);
 
+  // --- Infinite Scroll Observer ---
   const lastMemberRef = useCallback((node: HTMLDivElement) => {
     if (isLoading) return;
     if (observer.current) observer.current.disconnect();
@@ -147,7 +159,7 @@ const ManageMembers = () => {
       if (entries[0].isIntersecting && hasMore) {
         setPage(prev => prev + 1);
       }
-    }, { threshold: 1.0 }); // تحسين بسيط للـ Observer
+    }, { threshold: 1.0 });
 
     if (node) observer.current.observe(node);
   }, [isLoading, hasMore]);
@@ -156,10 +168,10 @@ const ManageMembers = () => {
     fetchMembers(page);
   }, [page]);
 
+  // --- Save Logic (Add/Edit) ---
   const handleSave = async () => {
     if (isLoading) return;
 
-    // التحقق من الحقول (يمكنك إضافة year للتحقق إذا كان مطلوباً)
     if (!formData.name || !formData.role || formData.points === undefined || !formData.specialization || !formData.bio || !formData.year) {
       toast.error(t('form.required'));
       return;
@@ -174,9 +186,16 @@ const ManageMembers = () => {
     data.append("Specialization", formData.specialization || "");
     data.append("Bio", formData.bio || "");
     data.append("Points", (formData.points || 0).toString());
-    data.append("Year", (formData.year || new Date().getFullYear()).toString()); // 4. إرسال السنة للباك اند
+    data.append("Year", (formData.year || new Date().getFullYear()).toString());
     data.append("LinkedInUrl", formData.linkedInUrl || "");
-    if (formData.image) data.append("Image", formData.image);
+
+    // --- 5. إصلاح مشكلة الـ 400 Bad Request ---
+    if (formData.image) {
+      // نتأكد من وجود اسم للملف لأن Blob قد يفقده
+      const fileName = (formData.image as File).name || "member-image.jpg";
+      // نرسل الاسم كمعامل ثالث إجباري
+      data.append("Image", formData.image, fileName);
+    }
 
     try {
       setIsLoading(true);
@@ -191,10 +210,20 @@ const ManageMembers = () => {
         body: data,
       });
 
-      if (!response.ok) throw new Error();
+      if (!response.ok) {
+        // قراءة الخطأ للـ debugging
+        const errorText = await response.text();
+        console.error("Server Error:", errorText);
+        throw new Error(errorText);
+      }
 
       if (editingMember) {
-        setMembers(prev => prev.map(m => m.id === editingMember.id ? { ...m, ...formData, currentImageUrl: formData.image ? URL.createObjectURL(formData.image) : m.currentImageUrl } as Member : m));
+        setMembers(prev => prev.map(m => m.id === editingMember.id ? { 
+            ...m, 
+            ...formData, 
+            // تحديث العرض المؤقت للصورة الجديدة
+            currentImageUrl: formData.image ? URL.createObjectURL(formData.image) : m.currentImageUrl 
+        } as Member : m));
       } else {
         setPage(1);
         fetchMembers(1);
@@ -203,20 +232,45 @@ const ManageMembers = () => {
       setIsDialogOpen(false);
       toast.success(t('toast.save.success'));
     } catch (error) {
+      console.error(error);
       toast.error(t('toast.save.error'));
     } finally {
       setIsLoading(false);
     }
   };
 
-  // دالة مساعدة لفتح الديالوج وإعادة تعيين القيم
+  // --- Delete Logic ---
+  const confirmDelete = async () => {
+    if (!memberToDelete || isLoading) return;
+
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`https://qenaracingteam.runasp.net/Racing/Member/DeleteMember/${memberToDelete.id}`, {
+        method: "DELETE",
+        headers: { "Authorization": `Bearer ${token}` },
+      });
+
+      if (!response.ok) throw new Error();
+
+      setMembers(prev => prev.filter(m => m.id !== memberToDelete.id));
+      toast.success(t('toast.delete.success'));
+    } catch {
+      toast.error(t('toast.delete.error'));
+    } finally {
+      setIsLoading(false);
+      setIsDeleteDialogOpen(false);
+      setMemberToDelete(null);
+    }
+  };
+
   const handleOpenAddDialog = () => {
     setEditingMember(null);
     setFormData({
         name: "", 
         role: "", 
         specialization: "", 
-        year: new Date().getFullYear(), // إعادة تعيين السنة
+        year: new Date().getFullYear(),
         bio: "", 
         points: 0, 
         linkedInUrl: ""
@@ -271,7 +325,7 @@ const ManageMembers = () => {
                         </Avatar>
                         <div className="flex flex-col">
                           <span className="font-bold text-base">{member.name}</span>
-                          <span className="text-xs text-muted-foreground">{member.specialization} - {member.year}</span> {/* عرض السنة بجانب التخصص اختياري */}
+                          <span className="text-xs text-muted-foreground">{member.specialization} - {member.year}</span>
                         </div>
                       </div>
                     </TableCell>
@@ -343,14 +397,8 @@ const ManageMembers = () => {
               </Avatar>
               <div className="grid gap-1.5 flex-1">
                 <Label>{t('form.image')}</Label>
-                <Input type="file" accept="image/*" className="cursor-pointer" onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file && file.size > 2 * 1024 * 1024) {
-                    toast.error(t('form.image.error'));
-                    return;
-                  }
-                  setFormData({ ...formData, image: file });
-                }} />
+                {/* 6. استخدام دالة المعالجة الجديدة */}
+                <Input type="file" accept="image/*" className="cursor-pointer" onChange={handleImageChange} />
               </div>
             </div>
 
@@ -374,24 +422,23 @@ const ManageMembers = () => {
               </div>
             </div>
 
-            {/* Row 2: Specialization & Year (New) */}
+            {/* Row 2: Specialization & Year */}
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label>{t('form.specialization')}</Label>
                 <Input value={formData.specialization} onChange={(e) => setFormData({ ...formData, specialization: e.target.value })} />
               </div>
-              {/* 5. إضافة حقل السنة في ال UI */}
               <div className="grid gap-2">
                 <Label className="flex items-center gap-2">
                      <Calendar className="h-4 w-4 text-muted-foreground" />
                      {t('form.year') || "السنة الدراسية"} 
                 </Label>
                 <Input 
-                    type="number" 
-                    min="2000" 
-                    max="2099" 
-                    value={formData.year} 
-                    onChange={(e) => setFormData({ ...formData, year: parseInt(e.target.value) || 0 })} 
+                   type="number" 
+                   min="2000" 
+                   max="2099" 
+                   value={formData.year} 
+                   onChange={(e) => setFormData({ ...formData, year: parseInt(e.target.value) || 0 })} 
                 />
               </div>
             </div>

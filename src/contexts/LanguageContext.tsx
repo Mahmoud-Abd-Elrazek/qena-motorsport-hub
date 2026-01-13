@@ -478,6 +478,71 @@ const translations: Record<Language, Record<string, string>> = {
 
     'project.related.similar': 'مشاريع مشابهة',
     'project.related.latest': 'شاهد أيضاً أحدث مشاريعنا',
+
+    // About Page
+    'about.page.hero.title': 'من نحن',
+
+    'about.story.title': 'قصتنا',
+    'about.story.fallback': 'قصة الفريق', // نص احتياطي في حال عدم وجود بيانات
+
+    'about.achievements.title': 'إنجازاتنا',
+    'about.achievements.subtitle': 'سجل حافل بالنجاحات والجوائز على مدار السنوات',
+
+    'achievements.loading': 'جاري تحميل الإنجازات...',
+    'achievements.empty': 'لا توجد إنجازات مسجلة حالياً.',
+
+    // Settings Page
+    'settings.title': 'إعدادات الموقع',
+    'settings.desc': 'تعديل البيانات، الصور، وروابط التواصل.',
+    'settings.save_btn': 'حفظ التغييرات',
+    'settings.compressing': 'جاري ضغط الصورة...',
+    'settings.upload_hint': 'اضغط لرفع صورة',
+    'settings.remove_img': 'حذف',
+
+    // Tabs
+    'settings.tab.content': 'المحتوى والهوية',
+    'settings.tab.contact': 'التواصل',
+    'settings.tab.social': 'السوشيال ميديا',
+
+    // Content Tab
+    'settings.section.basic': 'البيانات الأساسية والشعار',
+    'settings.label.site_name': 'اسم الموقع',
+    'settings.label.bio': 'الوصف المختصر',
+    'settings.label.logo': 'الشعار (Logo)',
+
+    'settings.section.hero': 'واجهة الهبوط',
+    'settings.label.hero_title': 'العنوان الرئيسي',
+    'settings.label.hero_subtitle': 'العنوان الفرعي',
+    'settings.label.hero_img': 'صورة الخلفية',
+
+    'settings.section.about': 'قسم "من نحن"',
+    'settings.label.about_title': 'العنوان',
+    'settings.label.about_content': 'المحتوى',
+    'settings.label.about_img': 'صورة القسم',
+
+    'settings.section.cards': 'بطاقات الهوية',
+    'settings.cards.add': 'إضافة',
+    'settings.cards.title_ph': 'العنوان',
+    'settings.cards.content_ph': 'المحتوى...',
+
+    'settings.section.story': 'القصة الكاملة',
+
+    // Contact Tab
+    'settings.section.contact': 'معلومات الاتصال',
+    'settings.label.email': 'البريد الإلكتروني',
+    'settings.label.phone': 'رقم الهاتف',
+    'settings.label.address': 'العنوان',
+    'settings.label.work_hours': 'ساعات العمل',
+
+    // Social Tab
+    'settings.section.social': 'السوشيال ميديا',
+
+    // Toasts
+    'settings.toast.img_ready': 'تم تجهيز الصورة',
+    'settings.toast.img_error': 'خطأ في معالجة الصورة',
+    'settings.toast.save_success': 'تم تحديث البيانات بنجاح!',
+    'settings.toast.save_error': 'فشل الاتصال بالسيرفر',
+    'settings.toast.login_req': 'يرجى تسجيل الدخول',
   },
   en: {
     // Header
@@ -901,5 +966,69 @@ const translations: Record<Language, Record<string, string>> = {
 
     'project.related.similar': 'Similar Projects',
     'project.related.latest': 'Check out our latest projects',
+
+    // About Page
+    'about.page.hero.title': 'Who We Are',
+    'about.story.title': 'Our Story',
+    'about.story.fallback': 'Team Story',
+
+    'about.achievements.title': 'Our Achievements',
+    'about.achievements.subtitle': 'A track record of success and awards over the years',
+
+    'achievements.loading': 'Loading achievements...',
+    'achievements.empty': 'No achievements recorded yet.',
+
+    // Settings Page
+    'settings.title': 'Site Settings',
+    'settings.desc': 'Update information, images, and social links.',
+    'settings.save_btn': 'Save Changes',
+    'settings.compressing': 'Compressing image...',
+    'settings.upload_hint': 'Click to upload image',
+    'settings.remove_img': 'Remove',
+
+    // Tabs
+    'settings.tab.content': 'Content & Identity',
+    'settings.tab.contact': 'Contact Info',
+    'settings.tab.social': 'Social Media',
+
+    // Content Tab
+    'settings.section.basic': 'Basic Info & Logo',
+    'settings.label.site_name': 'Site Name',
+    'settings.label.bio': 'Short Description',
+    'settings.label.logo': 'Logo',
+
+    'settings.section.hero': 'Hero Section',
+    'settings.label.hero_title': 'Main Title',
+    'settings.label.hero_subtitle': 'Subtitle',
+    'settings.label.hero_img': 'Background Image',
+
+    'settings.section.about': '"About Us" Section',
+    'settings.label.about_title': 'Title',
+    'settings.label.about_content': 'Content',
+    'settings.label.about_img': 'Section Image',
+
+    'settings.section.cards': 'Identity Cards',
+    'settings.cards.add': 'Add',
+    'settings.cards.title_ph': 'Title',
+    'settings.cards.content_ph': 'Content...',
+
+    'settings.section.story': 'Full Story',
+
+    // Contact Tab
+    'settings.section.contact': 'Contact Information',
+    'settings.label.email': 'Email Address',
+    'settings.label.phone': 'Phone Number',
+    'settings.label.address': 'Address',
+    'settings.label.work_hours': 'Work Hours',
+
+    // Social Tab
+    'settings.section.social': 'Social Media',
+
+    // Toasts
+    'settings.toast.img_ready': 'Image processed',
+    'settings.toast.img_error': 'Error processing image',
+    'settings.toast.save_success': 'Settings updated successfully!',
+    'settings.toast.save_error': 'Server connection failed',
+    'settings.toast.login_req': 'Please login first',
   }
 };

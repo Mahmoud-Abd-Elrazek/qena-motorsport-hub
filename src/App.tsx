@@ -29,11 +29,14 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import ManageAchievements from "./pages/admin/ManageAchievements";
 import GeneralSettings from "./pages/admin/GeneralSettings";
 
+import { SiteSettingsProvider } from '@/contexts/SiteSettingsContext';
+
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <LanguageProvider>
+      <SiteSettingsProvider>
       <TooltipProvider>
         <Toaster />
         <Sonner />
@@ -67,6 +70,7 @@ const App = () => (
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
+      </SiteSettingsProvider>
     </LanguageProvider>
   </QueryClientProvider>
 );
