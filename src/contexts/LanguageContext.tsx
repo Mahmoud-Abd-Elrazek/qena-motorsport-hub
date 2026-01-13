@@ -148,6 +148,7 @@ const translations: Record<Language, Record<string, string>> = {
     'admin.stats.members': 'الأعضاء',
     'admin.stats.projects': 'المشاريع',
     'admin.stats.points': 'النقاط الكلية',
+    'admin.stats.awards': 'عدد الانجازات',
 
     'admin.nav.members.title': 'إدارة الأعضاء',
     'admin.nav.members.desc': 'إضافة، تعديل، أو حذف أعضاء الفريق وإدارة معلوماتهم',
@@ -642,6 +643,7 @@ const translations: Record<Language, Record<string, string>> = {
     'admin.stats.members': 'Members',
     'admin.stats.projects': 'Projects',
     'admin.stats.points': 'Total Points',
+    'admin.stats.awards': 'Number of Achievements',
 
     'admin.nav.members.title': 'Manage Members',
     'admin.nav.members.desc': 'Add, edit, or delete team members and manage their info',

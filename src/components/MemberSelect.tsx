@@ -22,6 +22,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Textarea } from "./ui/textarea";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
+// 1. استدعاء مكتبة الضغط
+import imageCompression from 'browser-image-compression';
 
 export default function ProfessionalMemberSelect({ members, formData, setFormData, fetchMembers }) {
   const { t, language } = useLanguage();
@@ -31,17 +33,48 @@ export default function ProfessionalMemberSelect({ members, formData, setFormDat
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
 
-  // 2. تحديث الحالة الابتدائية لإضافة year
   const [formAddData, setFormAddData] = React.useState({
     name: "",
     role: "",
     specialization: "",
-    year: new Date().getFullYear(), // القيمة الافتراضية
+    year: new Date().getFullYear(),
     bio: "",
     points: 0,
     linkedInUrl: "",
     image: null
   });
+
+  // 2. إعدادات الضغط (نفس الإعدادات المستخدمة سابقاً لتوحيد الجودة)
+  const compressionOptions = {
+    maxSizeMB: 0.5,          // نصف ميجا كحد أقصى
+    maxWidthOrHeight: 1000,  // أبعاد مناسبة للصور الشخصية
+    useWebWorker: true,
+    initialQuality: 0.8,
+  };
+
+  // 3. دالة معالجة الصورة
+  const handleImageChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // تنبيه المستخدم أن هناك معالجة تتم
+    const toastId = toast.loading(t('toast.processing') || "جارِ معالجة الصورة...");
+
+    try {
+      const compressedFile = await imageCompression(file, compressionOptions);
+      
+      setFormAddData(prev => ({ 
+        ...prev, 
+        image: compressedFile 
+      }));
+      
+      toast.dismiss(toastId);
+    } catch (error) {
+      console.error("Compression error:", error);
+      toast.error(t('toast.image_error') || "حدث خطأ أثناء ضغط الصورة");
+      toast.dismiss(toastId);
+    }
+  };
 
   const handleSave = async () => {
     if (isLoading) return;
@@ -56,11 +89,17 @@ export default function ProfessionalMemberSelect({ members, formData, setFormDat
     data.append("Name", formAddData.name);
     data.append("Role", formAddData.role);
     data.append("Specialization", formAddData.specialization);
-    data.append("Year", (formAddData.year || new Date().getFullYear()).toString()); // 3. إرسال السنة
+    data.append("Year", (formAddData.year || new Date().getFullYear()).toString());
     data.append("Bio", formAddData.bio);
     data.append("Points", (formAddData.points || 0).toString());
     data.append("LinkedInUrl", formAddData.linkedInUrl || "");
-    if (formAddData.image) data.append("Image", formAddData.image);
+    
+    // 4. معالجة الصورة لتجنب خطأ 400 Bad Request
+    if (formAddData.image) {
+        // نحاول أخذ الاسم من الملف، وإن لم يوجد (لأنه Blob) نضع اسماً افتراضياً
+        const fileName = formAddData.image.name || "new-member.jpg";
+        data.append("Image", formAddData.image, fileName);
+    }
 
     try {
       setIsLoading(true);
@@ -188,7 +227,8 @@ export default function ProfessionalMemberSelect({ members, formData, setFormDat
               </Avatar>
               <div className="grid gap-1.5 flex-1 text-start">
                 <Label>{t('form.image')}</Label>
-                <Input type="file" accept="image/*" onChange={(e) => setFormAddData({ ...formAddData, image: e.target.files?.[0] })} />
+                {/* 5. استبدال الـ inline onChange بدالة المعالجة */}
+                <Input type="file" accept="image/*" onChange={handleImageChange} />
               </div>
             </div>
 

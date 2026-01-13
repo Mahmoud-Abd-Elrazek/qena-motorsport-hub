@@ -6,7 +6,6 @@ import { useSiteSettings } from "@/contexts/SiteSettingsContext"; // 1. Import H
 const Footer = () => {
   const { t, language } = useLanguage();
   const { settings } = useSiteSettings(); // 2. Get Data
-  console.log("Site Settings in Footer:", settings?.data); // Debugging log
   const currentYear = new Date().getFullYear();
 
   return (
