@@ -4,7 +4,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Trophy, Medal, Award } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
-import { useLanguage } from "@/contexts/LanguageContext"; // استيراد الكونتكست
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useNavigate } from "react-router-dom"; // 1. استيراد useNavigate
 
 // Interfaces
 interface Member {
@@ -19,6 +20,9 @@ const Leaderboard = () => {
   const { t, language } = useLanguage();
   const isRTL = language === 'ar';
 
+  // 2. تعريف المتغير navigate
+  const navigate = useNavigate();
+
   const [members, setMembers] = useState<Member[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -30,14 +34,18 @@ const Leaderboard = () => {
     } catch (error) {
       toast.error(t('leaderboard.toast.error'));
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
     fetchMembers();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const handleMemberClick = (memberId: number) => {
+    navigate(`/member/${memberId}`);
+  };
 
   const getRankIcon = (index: number) => {
     if (index === 0) return <Trophy className="h-8 w-8 text-yellow-500" />;
@@ -75,8 +83,10 @@ const Leaderboard = () => {
             {members.slice(0, 3).map((member, index) => (
               <Card
                 key={member.memberId}
+                // إضافة حدث الضغط وتغيير شكل المؤشر
+                onClick={() => handleMemberClick(member.memberId)}
                 className={`${index === 0 ? "md:order-2 md:scale-110" : index === 1 ? "md:order-1" : "md:order-3"
-                  } shadow-racing`}
+                  } shadow-racing cursor-pointer transition-transform hover:-translate-y-2`}
               >
                 <CardContent className="p-6 text-center space-y-4">
                   <div className="flex justify-center">{getRankIcon(index)}</div>
@@ -115,7 +125,12 @@ const Leaderboard = () => {
           <h2 className="text-2xl font-bold text-foreground mb-6">{t('leaderboard.full_ranking')}</h2>
           <div className="space-y-3">
             {members.map((member, index) => (
-              <Card key={member.memberId} className="hover:shadow-card transition-smooth">
+              <Card
+                key={member.memberId}
+                // إضافة حدث الضغط هنا أيضاً
+                onClick={() => handleMemberClick(member.memberId)}
+                className="hover:shadow-card transition-smooth cursor-pointer"
+              >
                 <CardContent className="p-4">
                   <div className="flex items-center gap-4">
                     <div className="flex-shrink-0 w-12 text-center">
@@ -146,7 +161,7 @@ const Leaderboard = () => {
       </section>
 
       {/* Info Section */}
-      <section className="py-12 bg-muted/30">
+      {/* <section className="py-12 bg-muted/30">
         <div className="container mx-auto px-4 max-w-3xl">
           <Card>
             <CardContent className="p-8">
@@ -176,7 +191,7 @@ const Leaderboard = () => {
             </CardContent>
           </Card>
         </div>
-      </section>
+      </section> */}
 
       <Footer />
     </div>
