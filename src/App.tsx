@@ -30,18 +30,36 @@ import ManageAchievements from "./pages/admin/ManageAchievements";
 import GeneralSettings from "./pages/admin/GeneralSettings";
 
 import { SiteSettingsProvider } from '@/contexts/SiteSettingsContext';
+import { useEffect } from "react";
+import { useSiteSettings } from "@/contexts/SiteSettingsContext"; // 1. Import Hook
 
 const queryClient = new QueryClient();
+
+
+// === المكون المسؤول عن تغيير العنوان ===
+const SiteTitleUpdater = () => {
+  const { settings } = useSiteSettings();
+
+  useEffect(() => {
+    if (settings?.data?.siteName) {
+      document.title = settings.data.siteName;
+    }
+  }, [settings]);
+
+  return null;
+};
+// ======================================
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <LanguageProvider>
       <SiteSettingsProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
+        <SiteTitleUpdater />
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
             {/* ================= Public Routes ================= */}
             <Route path="/" element={<Index />} />
             <Route path="/about" element={<About />} />

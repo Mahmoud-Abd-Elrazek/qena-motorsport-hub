@@ -13,6 +13,7 @@ export interface IdentityCard {
 }
 
 export interface SiteSettingsData {
+   title: any;
    data: any;
    siteName: string;
    navbarBio: string;
