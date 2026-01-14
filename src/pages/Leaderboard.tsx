@@ -44,7 +44,7 @@ const Leaderboard = () => {
   }, []);
 
   const handleMemberClick = (memberId: number) => {
-    navigate(`/member/${memberId}`);
+    navigate(`/team/${memberId}`);
   };
 
   const getRankIcon = (index: number) => {

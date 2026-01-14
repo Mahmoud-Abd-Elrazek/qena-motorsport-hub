@@ -60,35 +60,34 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <Routes>
-            {/* ================= Public Routes ================= */}
-            <Route path="/" element={<Index />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/team" element={<Team />} />
-            <Route path="/team/:id" element={<MemberDetails />} />
-            <Route path="/projects" element={<Projects />} />
-            <Route path="/projects/:id" element={<ProjectDetails />} />
-            <Route path="/leaderboard" element={<Leaderboard />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/member/:id" element={<MemberDetails />} />
+              {/* ================= Public Routes ================= */}
+              <Route path="/" element={<Index />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/team" element={<Team />} />
+              <Route path="/team/:id" element={<MemberDetails />} />
+              <Route path="/projects" element={<Projects />} />
+              <Route path="/projects/:id" element={<ProjectDetails />} />
+              <Route path="/leaderboard" element={<Leaderboard />} />
+              <Route path="/contact" element={<Contact />} />
 
-            <Route path="/login" element={<Login />} />
+              <Route path="/login" element={<Login />} />
 
-            {/* ================= Protected Admin Routes ================= */}
-            <Route element={<ProtectedRoute />}>
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/admin/members" element={<ManageMembers />} />
-              <Route path="/admin/projects" element={<ManageProjects />} />
-              <Route path="/admin/points" element={<ManagePoints />} />
-              <Route path="/admin/messages" element={<ManageMessages />} />
-              <Route path="/admin/achievements" element={<ManageAchievements />} />
-              <Route path="/admin/GeneralSettings" element={<GeneralSettings />} />
-            </Route>
+              {/* ================= Protected Admin Routes ================= */}
+              <Route element={<ProtectedRoute />}>
+                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/admin/members" element={<ManageMembers />} />
+                <Route path="/admin/projects" element={<ManageProjects />} />
+                <Route path="/admin/points" element={<ManagePoints />} />
+                <Route path="/admin/messages" element={<ManageMessages />} />
+                <Route path="/admin/achievements" element={<ManageAchievements />} />
+                <Route path="/admin/GeneralSettings" element={<GeneralSettings />} />
+              </Route>
 
-            {/* Catch-all Route */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+              {/* Catch-all Route */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
       </SiteSettingsProvider>
     </LanguageProvider>
   </QueryClientProvider>
